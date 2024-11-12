@@ -31,22 +31,31 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Get the width and height of the device screen using MediaQuery
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50], // Background color
       body: Center(
         child: SingleChildScrollView( // Allows scrolling if needed on smaller screens
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08), // Dynamic padding
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+            // Dynamic padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // App Logo with White Background and Text
                 CircleAvatar(
-                  radius: screenWidth * 0.15, // Dynamic radius based on screen width
-                  backgroundColor: Colors.white, // White background for avatar
+                  radius: screenWidth * 0.15,
+                  // Dynamic radius based on screen width
+                  backgroundColor: Colors.white,
+                  // White background for avatar
                   child: Text(
                     'Logo App', // Text inside the avatar
                     style: TextStyle(
@@ -79,7 +88,8 @@ class LoginPage extends StatelessWidget {
                     labelText: 'Kata Laluan',
                     filled: true,
                     fillColor: Colors.white,
-                    suffixIcon: const Icon(Icons.visibility_off), // Hide/show password icon
+                    suffixIcon: const Icon(Icons.visibility_off),
+                    // Hide/show password icon
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
@@ -101,7 +111,8 @@ class LoginPage extends StatelessWidget {
                         vertical: screenHeight * 0.02,
                         horizontal: screenWidth * 0.3), // Button color
                   ),
-                  child: Text('Log Masuk', style: TextStyle(fontSize: screenWidth * 0.045)),
+                  child: Text('Log Masuk',
+                      style: TextStyle(fontSize: screenWidth * 0.045)),
                 ),
 
                 SizedBox(height: screenHeight * 0.03), // Dynamic spacing
@@ -111,13 +122,15 @@ class LoginPage extends StatelessWidget {
                   onPressed: () {
                     // Implement sign up functionality here
                   },
-                  child: const Text('Daftar Akaun Baru', style: TextStyle(color: Colors.blue)),
+                  child: const Text('Daftar Akaun Baru',
+                      style: TextStyle(color: Colors.blue)),
                 ),
                 TextButton(
                   onPressed: () {
                     // Implement forgot password functionality here
                   },
-                  child: const Text('Terlupa Kata Laluan?', style: TextStyle(color: Colors.blue)),
+                  child: const Text('Terlupa Kata Laluan?',
+                      style: TextStyle(color: Colors.blue)),
                 ),
               ],
             ),
@@ -126,4 +139,5 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+}
 
