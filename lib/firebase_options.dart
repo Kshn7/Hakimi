@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -54,9 +42,48 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDSGAQJXVvdhe8lY-oWGobx1PyVDf0zpdE',
-    appId: '1:519117202524:android:e5386e3bcd2444c6ac7299',
+    appId: '1:519117202524:android:217d920fb12bcea7ac7299',
     messagingSenderId: '519117202524',
     projectId: 'homestay-management-d133e',
     storageBucket: 'homestay-management-d133e.firebasestorage.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyANkhHhC_a52hV7XSK2guBGteADQipzKfU',
+    appId: '1:519117202524:web:edcb41d1eb161487ac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    authDomain: 'homestay-management-d133e.firebaseapp.com',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    measurementId: 'G-DHNJQ3JX59',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBkTVx3_BQJs_shtI_QACOZzU8nKEQzRYA',
+    appId: '1:519117202524:ios:a5330b054519d2edac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    iosBundleId: 'com.aqwise.homestayForm',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBkTVx3_BQJs_shtI_QACOZzU8nKEQzRYA',
+    appId: '1:519117202524:ios:a5330b054519d2edac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    iosBundleId: 'com.aqwise.homestayForm',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyANkhHhC_a52hV7XSK2guBGteADQipzKfU',
+    appId: '1:519117202524:web:a99e37b654aa4a2eac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    authDomain: 'homestay-management-d133e.firebaseapp.com',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    measurementId: 'G-ZXYDD4K132',
+  );
+
 }
