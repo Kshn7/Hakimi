@@ -13,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _register = false;
+  bool _forgot = false;
   bool _isPasswordVisible = false; // Track password visibility
   @override
   Widget build(BuildContext context) {
@@ -64,44 +65,49 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: screenHeight * 0.02), // Dynamic spacing
 
                 // Password TextField
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    labelText: 'Kata Laluan',
-                    filled: true,
-                    fillColor: Colors.white,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                if (!_forgot)
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Kata Laluan',
+                      filled: true,
+                      fillColor: Colors.white,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible =
-                              !_isPasswordVisible; // Toggle visibility
-                        });
-                      },
-                    ),
-                    // Hide/show password icon
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
+                      // Hide/show password icon
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-                ),
                 SizedBox(height: screenHeight * 0.02), // Dynamic spacing
 
                 // Login Button
                 ElevatedButton(
                   onPressed: () {
                     // Implement login functionality here
-                    _register
-                        ? addUser(
-                            _emailController.text, _passwordController.text)
-                        : loginUser(_emailController.value.text,
-                            _passwordController.value.text);
+                    if (_forgot) {
+                      resetPassword(_emailController.text);
+                    } else {
+                      _register
+                          ? addUser(
+                              _emailController.text, _passwordController.text)
+                          : loginUser(_emailController.value.text,
+                              _passwordController.value.text);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -110,10 +116,17 @@ class _LoginPageState extends State<LoginPage> {
                     backgroundColor: Colors.blue,
                     padding: EdgeInsets.symmetric(
                         vertical: screenHeight * 0.02,
-                        horizontal: screenWidth * 0.3), // Button color
+                        horizontal: screenWidth * 0.2), // Button color
                   ),
-                  child: Text(_register ? 'Daftar' : 'Log Masuk',
-                      style: TextStyle(fontSize: screenWidth * 0.045)),
+                  child: Text(
+                    _forgot
+                        ? 'Tetapkan semula'
+                        : _register
+                            ? 'Daftar'
+                            : 'Log Masuk',
+                    style: TextStyle(fontSize: screenWidth * 0.045),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
 
                 SizedBox(height: screenHeight * 0.03), // Dynamic spacing
@@ -123,17 +136,21 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     setState(() {});
                     _register = !_register;
+                    _forgot = false;
                   },
                   child: Text(_register ? 'Log masuk' : 'Daftar Akaun Baru',
                       style: const TextStyle(color: Colors.blue)),
                 ),
-                TextButton(
-                  onPressed: () {
-                    resetPassword(_emailController.text);
-                  },
-                  child: const Text('Terlupa Kata Laluan?',
-                      style: TextStyle(color: Colors.blue)),
-                ),
+                if (!_forgot)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _forgot = true;
+                      });
+                    },
+                    child: const Text('Terlupa Kata Laluan?',
+                        style: TextStyle(color: Colors.blue)),
+                  ),
               ],
             ),
           ),
