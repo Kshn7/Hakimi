@@ -12,146 +12,165 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Global form key for validation
   bool _register = false;
   bool _forgot = false;
-  bool _isPasswordVisible = false; // Track password visibility
+  bool _isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
-    // Get the width and height of the device screen using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50], // Background color
+      backgroundColor: Colors.lightBlue[50],
       body: Center(
         child: SingleChildScrollView(
-          // Allows scrolling if needed on smaller screens
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-            // Dynamic padding
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // App Logo with White Background and Text
-                CircleAvatar(
-                  radius: screenWidth * 0.15,
-                  // Dynamic radius based on screen width
-                  backgroundColor: Colors.white,
-                  // White background for avatar
-                  child: Text(
-                    'Logo App', // Text inside the avatar
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.05, // Dynamic font size
-                      color: Colors.black, // Text color
-                      fontWeight: FontWeight.bold,
+            child: Form(
+              key: _formKey, // Assign the form key here
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: screenWidth * 0.15,
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      'Logo App',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: screenHeight * 0.05), // Dynamic spacing
+                  SizedBox(height: screenHeight * 0.05),
 
-                // Email TextField
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Emel',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.02), // Dynamic spacing
-
-                // Password TextField
-                if (!_forgot)
+                  // Email TextField with validation
                   TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
+                    controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Kata Laluan',
+                      labelText: 'Emel',
                       filled: true,
                       fillColor: Colors.white,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible =
-                                !_isPasswordVisible; // Toggle visibility
-                          });
-                        },
-                      ),
-                      // Hide/show password icon
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
                   ),
-                SizedBox(height: screenHeight * 0.02), // Dynamic spacing
+                  SizedBox(height: screenHeight * 0.02),
 
-                // Login Button
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement login functionality here
-                    if (_forgot) {
-                      resetPassword(_emailController.text);
-                    } else {
-                      _register
-                          ? addUser(
-                              _emailController.text, _passwordController.text)
-                          : loginUser(_emailController.value.text,
-                              _passwordController.value.text);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                  // Password TextField
+                  if (!_forgot)
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: 'Kata Laluan',
+                        filled: true,
+                        fillColor: Colors.white,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
                     ),
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.02,
-                        horizontal: screenWidth * 0.2), // Button color
-                  ),
-                  child: Text(
-                    _forgot
-                        ? 'Tetapkan semula'
-                        : _register
-                            ? 'Daftar'
-                            : 'Log Masuk',
-                    style: TextStyle(fontSize: screenWidth * 0.045),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                  SizedBox(height: screenHeight * 0.02),
 
-                SizedBox(height: screenHeight * 0.03), // Dynamic spacing
+                  // Login Button
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        if (_forgot) {
+                          resetPassword(_emailController.text);
+                        } else {
+                          _register
+                              ? addUser(
+                            _emailController.text,
+                            _passwordController.text,
+                          )
+                              : loginUser(
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.02,
+                          horizontal: screenWidth * 0.2),
+                    ),
+                    child: Text(
+                      _forgot
+                          ? 'Tetapkan semula'
+                          : _register
+                          ? 'Daftar'
+                          : 'Log Masuk',
+                      style: TextStyle(fontSize: screenWidth * 0.045),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
 
-                // Additional Links
-                TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    _register = !_register;
-                    _forgot = false;
-                  },
-                  child: Text(_register ? 'Log masuk' : 'Daftar Akaun Baru',
-                      style: const TextStyle(color: Colors.blue)),
-                ),
-                if (!_forgot)
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // Additional Links
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        _forgot = true;
+                        _register = !_register;
+                        _forgot = false;
                       });
                     },
-                    child: const Text('Terlupa Kata Laluan?',
-                        style: TextStyle(color: Colors.blue)),
+                    child: Text(
+                      _register ? 'Log masuk' : 'Daftar Akaun Baru',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
                   ),
-              ],
+                  if (!_forgot)
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _forgot = true;
+                        });
+                      },
+                      child: const Text(
+                        'Terlupa Kata Laluan?',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
