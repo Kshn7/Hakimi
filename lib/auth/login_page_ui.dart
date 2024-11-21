@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                  SizedBox(height: screenHeight * 0.02),
+                  SizedBox(height: screenHeight * 0.05),
 
                   // Login Button
                   ElevatedButton(
