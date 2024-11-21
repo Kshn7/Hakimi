@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:homestay_form/landing/landing.dart';
 
-import 'auth/login_page_ui.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -24,9 +24,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(), // Changed to LoginPage
+      home: LandingPage(), // Changed to LoginPage
       debugShowCheckedModeBanner: false,
     );
   }
 }
-

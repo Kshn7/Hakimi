@@ -112,13 +112,13 @@ class _LoginPageState extends State<LoginPage> {
                         } else {
                           _register
                               ? addUser(
-                            _emailController.text,
-                            _passwordController.text,
-                          )
+                                  _emailController.text,
+                                  _passwordController.text,
+                                )
                               : loginUser(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
                         }
                       }
                     },
@@ -135,9 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                       _forgot
                           ? 'Tetapkan semula'
                           : _register
-                          ? 'Daftar'
-                          : 'Log Masuk',
-                      style: TextStyle(fontSize: screenWidth * 0.045),
+                              ? 'Daftar'
+                              : 'Log Masuk',
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.045, color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),
