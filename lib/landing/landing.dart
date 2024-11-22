@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:homestay_form/auth/login_page_ui.dart';
-
-import '../calendar/calendar.dart';
+import 'package:homestay_form/home/home.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -18,9 +17,7 @@ class _LandingPageState extends State<LandingPage> {
       body: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
-            return snapshot.data != null
-                ? BookingCalendarPage()
-                : const LoginPage();
+            return snapshot.data != null ? HomePage() : const LoginPage();
           }),
     );
   }
