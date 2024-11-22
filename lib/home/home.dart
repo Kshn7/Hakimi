@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:homestay_form/calendar/calendar.dart';
 
 import '../profile/profile.dart';
+import '../receipt/receipt.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +25,7 @@ class HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     BookingCalendarPage(),
-    const Center(child: Text('Receipt Generator')),
+    ReceiptGenerator(),
     const Center(child: Text('Senarai Pelanggan Page')),
     const Center(child: Text('Senarai Resit Page')),
     const ProfilePage(),
