@@ -1,4 +1,4 @@
-package com.aqwise.homestay_form
+package com.flutterdaily.demo
 
 import io.flutter.embedding.android.FlutterActivity
 

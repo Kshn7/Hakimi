@@ -2,6 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'firebase_options.dart';
+import 'booking_calendar_ui.dart'; // Import the Booking Calendar UI
+import 'booking_calendar_backend.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,8 +26,49 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(), // Changed to LoginPage
+      home: const HomeSelector(), // Selector for navigating pages
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/calendar': (context) => const BookingCalendarPage(), // Calendar route
+        '/testBooking': (context) => BookingTestScreen(),
+      },
+    );
+  }
+}
+
+class HomeSelector extends StatelessWidget {
+  const HomeSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Home Selector')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/login'); // Go to Login Page
+              },
+              child: const Text('Go to Login Page'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/calendar'); // Go to Calendar
+              },
+              child: const Text('Go to Booking Calendar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/testBooking'); // Go to Test Booking
+              },
+              child: const Text('Test Booking Backend'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -37,7 +81,6 @@ class LoginPage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Create controllers for the TextFields
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
@@ -63,10 +106,8 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.05),
-
-                // Email TextField
                 TextField(
-                  controller: emailController, // Use the controller here
+                  controller: emailController,
                   decoration: InputDecoration(
                     labelText: 'Emel',
                     filled: true,
@@ -78,10 +119,8 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
-
-                // Password TextField
                 TextField(
-                  controller: passwordController, // Use the controller here
+                  controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Kata Laluan',
@@ -95,28 +134,22 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
-
-                // Login Button
                 ElevatedButton(
                   onPressed: () async {
-                    String email = emailController.text.trim(); // Get email from controller
-                    String password = passwordController.text.trim(); // Get password from controller
+                    String email = emailController.text.trim();
+                    String password = passwordController.text.trim();
 
                     try {
-                      // Sign in the user
-                      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      UserCredential userCredential = await FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
-                      // Navigate to the next page or show success message here
-                      print("Login successful!"); // You can change this to a navigation action
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Login Successful!')),
                       );
-                      // Navigate to a different page after successful login
+                      Navigator.pushNamed(context, '/calendar'); // Go to Calendar on Login
                     } on FirebaseAuthException catch (e) {
-                      // Handle error (show a message to the user)
-                      print('Error: $e'); // You can also show a dialog or a Snackbar to inform the user
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Login Failed: ${e.message}')),
                       );
@@ -132,25 +165,8 @@ class LoginPage extends StatelessWidget {
                       horizontal: screenWidth * 0.3,
                     ),
                   ),
-                  child: Text('Log Masuk', style: TextStyle(fontSize: screenWidth * 0.045)),
-                ),
-
-                SizedBox(height: screenHeight * 0.03),
-
-                // Additional Links
-                TextButton(
-                  onPressed: () async {
-                    String email = emailController.text.trim();
-                    await addUser(email, passwordController.text.trim(), context);
-                  },
-                  child: const Text('Daftar Akaun Baru', style: TextStyle(color: Colors.blue)),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    String email = emailController.text.trim();
-                    await resetPassword(email, context);
-                  },
-                  child: const Text('Terlupa Kata Laluan?', style: TextStyle(color: Colors.blue)),
+                  child: Text('Log Masuk',
+                      style: TextStyle(fontSize: screenWidth * 0.045)),
                 ),
               ],
             ),
@@ -159,47 +175,59 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> addUser(String email, String password, BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User Added Successfully!')),
-      );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error Adding User: ${e.message}')),
-      );
-    }
-  }
-
-  Future<void> resetPassword(String email, BuildContext context) async {
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter your email')),
-      );
-      return;
-    }
-
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password Reset Email Sent!')),
-      );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message}')),
-      );
-    }
-  }
 }
 
+class BookingTestScreen extends StatefulWidget {
+  @override
+  _BookingTestScreenState createState() => _BookingTestScreenState();
+}
 
+class _BookingTestScreenState extends State<BookingTestScreen> {
+  final bookingBackend = BookingCalendarBackend();
+  String result = "Press a button to test";
 
-
-
-
-
-
-
-
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Booking Calendar Test")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                List<DateTime> dates = await bookingBackend.fetchBookedDates();
+                setState(() {
+                  result =
+                  "Fetched Dates: ${dates.map((d) => d.toString()).join(", ")}";
+                });
+              },
+              child: const Text("Fetch Booked Dates"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await bookingBackend.addBooking(DateTime(2024, 10, 25));
+                setState(() {
+                  result = "Added Booking for 2024-10-25";
+                });
+              },
+              child: const Text("Add Booking (2024-10-25)"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await bookingBackend.deleteBooking(DateTime(2024, 10, 15));
+                setState(() {
+                  result = "Deleted Booking for 2024-10-15";
+                });
+              },
+              child: const Text("Delete Booking (2024-10-15)"),
+            ),
+            const SizedBox(height: 20),
+            Text(result, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+}
