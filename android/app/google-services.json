@@ -2,11 +2,37 @@
   "project_info": {
     "project_number": "519117202524",
     "project_id": "homestay-management-d133e",
+<<<<<<< HEAD
     "storage_bucket": "homestay-management-d133e.appspot.com"
+=======
+    "storage_bucket": "homestay-management-d133e.firebasestorage.app"
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
   },
   "client": [
     {
       "client_info": {
+<<<<<<< HEAD
+=======
+        "mobilesdk_app_id": "1:519117202524:android:217d920fb12bcea7ac7299",
+        "android_client_info": {
+          "package_name": "com.aqwise.homestay_form"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSGAQJXVvdhe8lY-oWGobx1PyVDf0zpdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
         "mobilesdk_app_id": "1:519117202524:android:e5386e3bcd2444c6ac7299",
         "android_client_info": {
           "package_name": "com.flutterdaily.demo"

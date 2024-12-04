@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+
+import 'auth/login_page_ui.dart';
 import 'firebase_options.dart';
 import 'booking_calendar_ui.dart'; // Import the Booking Calendar UI
 import 'booking_calendar_backend.dart';
@@ -72,6 +73,7 @@ class HomeSelector extends StatelessWidget {
     );
   }
 }
+<<<<<<< HEAD
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -231,3 +233,5 @@ class _BookingTestScreenState extends State<BookingTestScreen> {
     );
   }
 }
+=======
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59

@@ -40,12 +40,24 @@ class DefaultFirebaseOptions {
     }
   }
 
+<<<<<<< HEAD
+=======
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDSGAQJXVvdhe8lY-oWGobx1PyVDf0zpdE',
+    appId: '1:519117202524:android:217d920fb12bcea7ac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+  );
+
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyANkhHhC_a52hV7XSK2guBGteADQipzKfU',
     appId: '1:519117202524:web:edcb41d1eb161487ac7299',
     messagingSenderId: '519117202524',
     projectId: 'homestay-management-d133e',
     authDomain: 'homestay-management-d133e.firebaseapp.com',
+<<<<<<< HEAD
     storageBucket: 'homestay-management-d133e.appspot.com',
     measurementId: 'G-DHNJQ3JX59',
   );
@@ -59,12 +71,31 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.flutterdaily.demo',
   );
 
+=======
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    measurementId: 'G-DHNJQ3JX59',
+  );
+
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBkTVx3_BQJs_shtI_QACOZzU8nKEQzRYA',
     appId: '1:519117202524:ios:a5330b054519d2edac7299',
     messagingSenderId: '519117202524',
     projectId: 'homestay-management-d133e',
+<<<<<<< HEAD
     storageBucket: 'homestay-management-d133e.appspot.com',
+=======
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    iosBundleId: 'com.aqwise.homestayForm',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBkTVx3_BQJs_shtI_QACOZzU8nKEQzRYA',
+    appId: '1:519117202524:ios:a5330b054519d2edac7299',
+    messagingSenderId: '519117202524',
+    projectId: 'homestay-management-d133e',
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
     iosBundleId: 'com.aqwise.homestayForm',
   );
 
@@ -74,6 +105,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '519117202524',
     projectId: 'homestay-management-d133e',
     authDomain: 'homestay-management-d133e.firebaseapp.com',
+<<<<<<< HEAD
     storageBucket: 'homestay-management-d133e.appspot.com',
     measurementId: 'G-ZXYDD4K132',
   );
@@ -86,4 +118,10 @@ class DefaultFirebaseOptions {
     storageBucket: 'homestay-management-d133e.appspot.com',
   );
 
+=======
+    storageBucket: 'homestay-management-d133e.firebasestorage.app',
+    measurementId: 'G-ZXYDD4K132',
+  );
+
+>>>>>>> 5dc0418ce29df46473272420c31451b1ed377c59
 }
