@@ -17,6 +17,29 @@ class _LoginPageState extends State<LoginPage> {
   bool _forgot = false;
   bool _isPasswordVisible = false;
 
+  // Email validation function using Regex
+  String? validateEmail(String? value) {
+    final emailRegex =
+    RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    } else if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    return null; // No error
+  }
+
+  // Password validation function using Regex
+  String? validatePassword(String? value) {
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    } else if (!passwordRegex.hasMatch(value)) {
+      return 'Password must be at least 8 characters long with letters and numbers';
+    }
+    return null; // No error
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -59,16 +82,11 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
+                    validator: validateEmail, // Updated with email validation
                   ),
                   SizedBox(height: screenHeight * 0.02),
 
-                  // Password TextField
+                  // Password TextField with validation
                   if (!_forgot)
                     TextFormField(
                       controller: _passwordController,
@@ -94,12 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        return null;
-                      },
+                      validator: validatePassword, // Updated with password validation
                     ),
                   SizedBox(height: screenHeight * 0.05),
 
@@ -107,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        // Validation passed
                         if (_forgot) {
                           resetPassword(_emailController.text);
                         } else {
@@ -185,7 +199,6 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login Successful!')),
       );
-      // Navigate to home page or another screen
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login Failed: ${e.toString()}')),
@@ -230,3 +243,4 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
+
