@@ -17,7 +17,7 @@ class _LandingPageState extends State<LandingPage> {
       body: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
-            return snapshot.data != null ? HomePage() : const LoginPage();
+            return snapshot.data != null ? const HomePage() : const LoginPage();
           }),
     );
   }

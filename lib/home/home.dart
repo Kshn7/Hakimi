@@ -46,7 +46,7 @@ class HomePageState extends State<HomePage> {
         actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
       ),
       body: SingleChildScrollView(
-        child: _widgetOptions[_selectedIndex],
+        child: Center(child: _widgetOptions[_selectedIndex]),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
