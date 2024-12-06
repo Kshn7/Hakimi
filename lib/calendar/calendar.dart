@@ -152,25 +152,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
             height: 40,
           ),
           // Search Bar
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: dateController,
-                  decoration: InputDecoration(
-                    labelText: "Search Date (YYYY-MM-DD)",
-                    border: OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        jumpToDate(dateController.text);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+
           const SizedBox(height: 16),
           // Calendar Header
           Container(
@@ -323,7 +305,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 40),
           // Navigation Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -331,6 +313,21 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 onPressed: decrementMonth,
+              ),
+              Expanded(
+                child: TextField(
+                  controller: dateController,
+                  decoration: InputDecoration(
+                    labelText: "Search Date (YYYY-MM-DD)",
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        jumpToDate(dateController.text);
+                      },
+                    ),
+                  ),
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios),
