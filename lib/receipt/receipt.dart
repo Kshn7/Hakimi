@@ -10,35 +10,33 @@ class ReceiptGenerator extends StatefulWidget {
 class _ReceiptGeneratorState extends State<ReceiptGenerator> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BigBox(),
-            SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Preview',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BigBox(),
+          SizedBox(height: 10),
+          Center(
+            child: Text(
+              'Preview',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            CustomInputField(
-              initialValue: '',
-              hintText: 'Customer details',
-            ),
-            SizedBox(height: 6),
-            CustomInputField(
-              hintText: 'Customer number',
-            ),
-            SizedBox(height: 12),
-            ReceiptDetails(),
-            SizedBox(height: 12),
-            GenerateButton(),
-          ],
-        ),
+          ),
+          SizedBox(height: 8),
+          CustomInputField(
+            initialValue: '',
+            hintText: 'Customer details',
+          ),
+          SizedBox(height: 6),
+          CustomInputField(
+            hintText: 'Customer number',
+          ),
+          SizedBox(height: 12),
+          ReceiptDetails(),
+          SizedBox(height: 12),
+          GenerateButton(),
+        ],
       ),
     );
   }
@@ -292,10 +290,13 @@ class LowerLabelInputBox extends StatelessWidget {
           ),
         ),
         TextFormField(
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           ),
+          style: const TextStyle(fontSize: 10),
         ),
       ],
     );
@@ -311,6 +312,8 @@ class CustomInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: TextInputType.multiline,
+      maxLines: null,
       initialValue: initialValue,
       decoration: InputDecoration(
         hintText: hintText,
@@ -339,6 +342,7 @@ class ResitRasmiButton extends StatelessWidget {
         child: const Text(
           'RESIT RASMI',
           style: TextStyle(
+            color: Colors.white,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
@@ -356,10 +360,14 @@ class GenerateButton extends StatelessWidget {
     return Center(
       child: ElevatedButton.icon(
         onPressed: () {},
-        icon: const Icon(Icons.autorenew, color: Colors.green, size: 12),
+        icon: const Icon(Icons.autorenew, color: Colors.white, size: 12),
         label: const Text(
           'Generate',
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
