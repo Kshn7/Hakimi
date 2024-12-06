@@ -8,8 +8,8 @@ class BookingCalendarPage extends StatefulWidget {
 }
 
 class _BookingCalendarPageState extends State<BookingCalendarPage> {
-  int year = 2024;
-  int month = 10; // Start with October
+  int year = DateTime.now().year;
+  int month = DateTime.now().month; // Start with October
   int? selectedDay;
 
   final TextEditingController dateController = TextEditingController();
