@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'booking_calendar.dart'; // Import BookingCalendarPage
+import 'calendar/calendar.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const BookingCalendarPage(), // Set this as the home temporarily
+      home: BookingCalendarPage(), // Set this as the home temporarily
       debugShowCheckedModeBanner: false,
     );
   }
