@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:holiday_event_api/holiday_event_api.dart'; // Import the API package
 
 class BookingCalendarPage extends StatefulWidget {
   const BookingCalendarPage({super.key});
@@ -29,30 +27,33 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
   }
 
   Future<void> fetchHolidays() async {
-    final String apiUrl = 'https://checkiday.api.apilayer.com/holidays';
-    final String apiKey = 'j0kvnWOfTiDK2vP1ADyl0THt1W25FV7I';
-
-    final Uri url = Uri.parse('$apiUrl?country=US');
+    // Initialize the holiday API client with your API key
+    final apiClient = HolidayEventApi(
+        'j0kvnWOfTiDK2vP1ADyl0THt1W25FV7I'); // Corrected to use the API key
 
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'apikey': apiKey,
-        },
+      // Fetch events for the whole year without specifying timezone
+      final events = await apiClient.getEvents(
+        adult: false, // Don't include adult content
       );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> holidays = data['holidays'];
-
-        setState(() {
-          holidayDates =
-              holidays.map((holiday) => holiday['date'] as String).toList();
-        });
-      } else {
-        throw Exception('Failed to load holidays: ${response.body}');
-      }
+      setState(() {
+        // Filter the events to only include those in the current month and year
+        holidayDates = events.events.where((event) {
+          // Assuming the event name contains the date in a recognizable format
+          final date = DateTime.tryParse(event.name.split(" ")[0]);
+          if (date != null) {
+            return date.year == year && date.month == month;
+          }
+          return false;
+        }).map((event) {
+          // Extract just the date part for storing in holidayDates
+          final date = DateTime.tryParse(event.name.split(" ")[0]);
+          return date != null
+              ? "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}"
+              : "";
+        }).toList();
+      });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -96,7 +97,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Booking Calendar'),
+        title: const Text('Booking Calendar'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -122,6 +123,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
             ),
             const SizedBox(height: 16),
             Expanded(
+              // Make sure the GridView is inside an Expanded widget
               child: GridView.builder(
                 itemCount: daysInMonth + firstDayIndex,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

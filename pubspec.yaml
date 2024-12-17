@@ -32,10 +32,11 @@ dependencies:
     sdk: flutter
   firebase_core: ^3.7.0
   firebase_auth: ^5.3.2
+  holiday_event_api: ^1.0.2
   cloud_firestore:
   url_launcher: ^6.1.7
   flutter_dotenv: ^5.0.2
-  holiday_event_api: ^1.0.2
+
 
 
   # The following adds the Cupertino Icons font to your application.
