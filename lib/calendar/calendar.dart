@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:holiday_event_api/holiday_event_api.dart'; // Import the API package
+import 'package:holiday_event_api/holiday_event_api.dart';
 
 class BookingCalendarPage extends StatefulWidget {
   const BookingCalendarPage({super.key});
@@ -12,7 +12,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
   int year = DateTime.now().year;
   int month = DateTime.now().month;
   int? selectedDay;
-  List<String> holidayDates = []; // To store the fetched holiday dates
+  List<String> holidayDates = [];
 
   final Map<String, List<String>> bookings = {
     "2024-10-15": ["10:00 AM - John Doe", "2:00 PM - Jane Smith"],
@@ -27,32 +27,27 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
   }
 
   Future<void> fetchHolidays() async {
-    // Initialize the holiday API client with your API key
-    final apiClient = HolidayEventApi(
-        'j0kvnWOfTiDK2vP1ADyl0THt1W25FV7I'); // Corrected to use the API key
+    final apiClient = HolidayEventApi('j0kvnWOfTiDK2vP1ADyl0THt1W25FV7I');
 
     try {
-      // Fetch events for the whole year without specifying timezone
-      final events = await apiClient.getEvents(
-        adult: false, // Don't include adult content
-      );
+      final events = await apiClient.getEvents(adult: false);
 
+      // Attempting to extract dates from the event name
       setState(() {
-        // Filter the events to only include those in the current month and year
-        holidayDates = events.events.where((event) {
-          // Assuming the event name contains the date in a recognizable format
-          final date = DateTime.tryParse(event.name.split(" ")[0]);
-          if (date != null) {
-            return date.year == year && date.month == month;
-          }
-          return false;
-        }).map((event) {
-          // Extract just the date part for storing in holidayDates
-          final date = DateTime.tryParse(event.name.split(" ")[0]);
-          return date != null
-              ? "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}"
-              : "";
-        }).toList();
+        holidayDates = events.events
+            .map((event) {
+              // Assuming event.name might contain a date in the format '2024-12-25' or similar
+              final eventName = event.name;
+              final dateMatch =
+                  RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(eventName);
+              if (dateMatch != null) {
+                return dateMatch.group(0) ?? '';
+              } else {
+                return ''; // Return empty if no valid date is found
+              }
+            })
+            .where((date) => date.isNotEmpty) // Remove any empty strings
+            .toList();
       });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,8 +118,9 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              // Make sure the GridView is inside an Expanded widget
               child: GridView.builder(
+                shrinkWrap: true, // Solves the infinite size issue
+                physics: const ClampingScrollPhysics(),
                 itemCount: daysInMonth + firstDayIndex,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 7,
