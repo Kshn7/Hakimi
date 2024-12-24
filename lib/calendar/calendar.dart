@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:holiday_event_api/holiday_event_api.dart';
+import 'package:http/http.dart' as http;
 
 class BookingCalendarPage extends StatefulWidget {
   const BookingCalendarPage({super.key});
@@ -27,28 +29,28 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
   }
 
   Future<void> fetchHolidays() async {
-    final apiClient = HolidayEventApi('j0kvnWOfTiDK2vP1ADyl0THt1W25FV7I');
+    final uri = Uri.https('holidayapi.com', '/v1/holidays', {
+      'country': 'MY',
+      'year': year.toString(),
+      'month': month.toString(),
+      'key': '0ba24f61-9795-4f75-b4c9-71afc2e556c0', // Your API key
+      'public': 'true', // Optional filter for public holidays only
+      'pretty': 'true' // Optional to prettify the response
+    });
 
     try {
-      final events = await apiClient.getEvents(adult: false);
+      final response = await http.get(uri);
 
-      // Attempting to extract dates from the event name
-      setState(() {
-        holidayDates = events.events
-            .map((event) {
-              // Assuming event.name might contain a date in the format '2024-12-25' or similar
-              final eventName = event.name;
-              final dateMatch =
-                  RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(eventName);
-              if (dateMatch != null) {
-                return dateMatch.group(0) ?? '';
-              } else {
-                return ''; // Return empty if no valid date is found
-              }
-            })
-            .where((date) => date.isNotEmpty) // Remove any empty strings
-            .toList();
-      });
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          holidayDates = (data['holidays'] as List)
+              .map((holiday) => holiday['date'] as String)
+              .toList();
+        });
+      } else {
+        throw Exception('Failed to fetch holidays: ${response.body}');
+      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -119,7 +121,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
             const SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
-                shrinkWrap: true, // Solves the infinite size issue
+                shrinkWrap: true,
                 physics: const ClampingScrollPhysics(),
                 itemCount: daysInMonth + firstDayIndex,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -175,6 +177,8 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                 },
               ),
             ),
+            // Your holidays table
+            HolidaysTable(holidayDates: holidayDates),
           ],
         ),
       ),
@@ -220,4 +224,26 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
     'November',
     'December',
   ];
+}
+
+class HolidaysTable extends StatelessWidget {
+  final List<String> holidayDates;
+
+  const HolidaysTable({super.key, required this.holidayDates});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: holidayDates.length,
+        itemBuilder: (context, index) {
+          final holidayDate = holidayDates[index];
+          return ListTile(
+            title: Text(holidayDate),
+            trailing: const Icon(Icons.calendar_today),
+          );
+        },
+      ),
+    );
+  }
 }
