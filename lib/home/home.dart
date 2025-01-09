@@ -24,8 +24,8 @@ class HomePageState extends State<HomePage> {
   ];
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const BookingCalendarPage(),
-    const ReceiptGenerator(),
+    BookingCalendarPage(),
+    ReceiptGenerator(),
     const Center(child: Text('Senarai Pelanggan Page')),
     const Center(child: Text('Senarai Resit Page')),
     const ProfilePage(),
