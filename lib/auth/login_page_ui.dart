@@ -102,11 +102,18 @@ class _LoginPageState extends State<LoginPage> {
                     if (_forgot) {
                       resetPassword(_emailController.text);
                     } else {
-                      _register
-                          ? addUser(
-                              _emailController.text, _passwordController.text)
-                          : loginUser(_emailController.value.text,
-                              _passwordController.value.text);
+                      if (_emailController.text.isNotEmpty &&
+                          _passwordController.text.isNotEmpty) {
+                        _register
+                            ? addUser(
+                                _emailController.text, _passwordController.text)
+                            : loginUser(_emailController.value.text,
+                                _passwordController.value.text);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Please fill all forms")));
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -124,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                         : _register
                             ? 'Daftar'
                             : 'Log Masuk',
-                    style: TextStyle(fontSize: screenWidth * 0.045),
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.045, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                 ),
