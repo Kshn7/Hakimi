@@ -1,11 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:homestay_form/landing/landing.dart';
 import 'package:homestay_form/auth/login_page_ui.dart';
 import 'package:homestay_form/calendar/calendar.dart';
 import 'package:homestay_form/landing/landing.dart';
 
-import 'auth/login_page_ui.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

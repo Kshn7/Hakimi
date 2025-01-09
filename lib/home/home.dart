@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:homestay_form/calendar/calendar.dart';
 
+import '../calendar/calendar.dart';
 import '../profile/profile.dart';
 import '../receipt/receipt.dart';
 
@@ -24,7 +24,7 @@ class HomePageState extends State<HomePage> {
   ];
 
   static final List<Widget> _widgetOptions = <Widget>[
-    BookingCalendarPage(),
+    const BookingCalendarPage(),
     ReceiptGenerator(),
     const Center(child: Text('Senarai Pelanggan Page')),
     const Center(child: Text('Senarai Resit Page')),

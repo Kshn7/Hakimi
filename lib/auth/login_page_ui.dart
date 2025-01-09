@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   // Email validation function using Regex
   String? validateEmail(String? value) {
     final emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
+        RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     } else if (!emailRegex.hasMatch(value)) {
@@ -113,7 +113,8 @@ class _LoginPageState extends State<LoginPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      validator: validatePassword, // Updated with password validation
+                      validator:
+                          validatePassword, // Updated with password validation
                     ),
                   SizedBox(height: screenHeight * 0.05),
 
