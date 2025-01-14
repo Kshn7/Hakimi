@@ -17,6 +17,12 @@ class ReceiptGenerator extends StatefulWidget {
 class _ReceiptGeneratorState extends State<ReceiptGenerator> {
   // Create a GlobalKey to capture the widget
   final key = GlobalKey();
+  final TextEditingController _custNameController = TextEditingController();
+  final TextEditingController _custNumberController = TextEditingController();
+
+  String custname = '';
+  String custnumber = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          RepaintBoundary(key: key, child: const BigBox()),
+          RepaintBoundary(key: key, child: const BigBox(custname: '',)),
           const SizedBox(height: 10),
           const Center(
             child: Text(
@@ -34,17 +40,35 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
             ),
           ),
           const SizedBox(height: 8),
-          const CustomInputField(
-            initialValue: '',
+          CustomInputField(
+            controller: _custNameController,
             hintText: 'Customer details',
           ),
           const SizedBox(height: 6),
-          const CustomInputField(
+          CustomInputField(
+            controller: _custNumberController,
             hintText: 'Customer number',
           ),
           const SizedBox(height: 12),
           const ReceiptDetails(),
           const SizedBox(height: 24),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  custname = _custNameController.text;
+                  custnumber = _custNumberController.text;
+
+                });
+
+                print('Customer Name: $custname');
+                print('Customer Number: $custnumber');
+              },
+              child: const Text('Save Details'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Generate button
           Center(
             child: ElevatedButton.icon(
               onPressed: () {
@@ -63,8 +87,10 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
                 backgroundColor: Colors.blue,
               ),
             ),
+
           ),
         ],
+
       ),
     );
   }
@@ -102,15 +128,26 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
 
   Future<Uint8List> _captureWidgetToImage(GlobalKey key) async {
     RenderRepaintBoundary boundary =
-        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    key.currentContext!.findRenderObject() as RenderRepaintBoundary;
     var image = await boundary.toImage(pixelRatio: 3.0);
     ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
     return byteData!.buffer.asUint8List();
   }
 }
 
-class ReceiptDetails extends StatelessWidget {
+class ReceiptDetails extends StatefulWidget {
   const ReceiptDetails({super.key});
+
+  @override
+  _ReceiptDetailsState createState() => _ReceiptDetailsState();
+}
+
+class _ReceiptDetailsState extends State<ReceiptDetails> {
+  // Define state variables for each box's content
+  String packageContent = '';
+  String paymentContent = '';
+  String priceContent = '';
+  String dateContent = '';
 
   @override
   Widget build(BuildContext context) {
@@ -120,20 +157,61 @@ class ReceiptDetails extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            buildDetailCard(title: 'Package', content: '6 Bilik\n6 Bilik Air'),
+            buildDetailCard(
+              title: 'Package',
+              content: packageContent,
+              context: context,
+              onSave: (newContent) {
+                setState(() {
+                  packageContent = newContent;  // Update the content state
+                });
+              },
+            ),
             const SizedBox(width: 6),
-            buildDetailCard(title: 'Payment', content: 'Deposit'),
+            buildDetailCard(
+              title: 'Payment',
+              content: paymentContent,
+              context: context,
+              onSave: (newContent) {
+                setState(() {
+                  paymentContent = newContent;  // Update the content state
+                });
+              },
+            ),
             const SizedBox(width: 6),
-            buildDetailCard(title: 'Price', content: 'RM 350'),
+            buildDetailCard(
+              title: 'Price',
+              content: priceContent,
+              context: context,
+              onSave: (newContent) {
+                setState(() {
+                  priceContent = newContent;  // Update the content state
+                });
+              },
+            ),
             const SizedBox(width: 6),
-            buildDetailCard(title: 'Date', content: '17/10/2024 -\n19/10/2024'),
+            buildDetailCard(
+              title: 'Date',
+              content: dateContent,
+              context: context,
+              onSave: (newContent) {
+                setState(() {
+                  dateContent = newContent;  // Update the content state
+                });
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget buildDetailCard({required String title, required String content}) {
+  Widget buildDetailCard({
+    required String title,
+    required String content,
+    required BuildContext context,
+    required Function(String) onSave, // Callback for saving the new content
+  }) {
     return Container(
       width: 100,
       height: 60,
@@ -153,30 +231,35 @@ class ReceiptDetails extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(2.0),
-            decoration: const BoxDecoration(
-              color: Colors.blueAccent,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(6.0),
-                topRight: Radius.circular(6.0),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+          GestureDetector(
+            onTap: () {
+              _showPopup(context, title, content, onSave);
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(2.0),
+              decoration: const BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(6.0),
+                  topRight: Radius.circular(6.0),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.edit, color: Colors.white, size: 10),
-              ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.edit, color: Colors.white, size: 10),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 2),
@@ -192,10 +275,50 @@ class ReceiptDetails extends StatelessWidget {
       ),
     );
   }
+
+  void _showPopup(BuildContext context, String title, String initialContent, Function(String) onSave) {
+    TextEditingController controller = TextEditingController(text: initialContent);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit $title'),
+          content: TextField(
+            controller: controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Enter new $title details',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newContent = controller.text;
+                onSave(newContent); // Call onSave to update the content
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
+
+
 class BigBox extends StatelessWidget {
-  const BigBox({super.key});
+  final String custname;
+  const BigBox({super.key, required this.custname});
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +378,10 @@ class BigBox extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                const LowerLabelInputBoxes(),
+              LowerLabelInputBoxes(
+                custname: custname, // Retrieve the value dynamically
+              ),
+
                 // const SizedBox(height: 10),
                 // const ResitRasmiButton(),
                 const SizedBox(height: 4),
@@ -265,6 +391,7 @@ class BigBox extends StatelessWidget {
                     'Resit ini adalah cetakan komputer',
                     style: TextStyle(fontSize: 10, color: Colors.black54),
                   ),
+
                 ),
               ],
             ),
@@ -301,87 +428,199 @@ class BigBox extends StatelessWidget {
   }
 }
 
-class LowerLabelInputBoxes extends StatelessWidget {
-  const LowerLabelInputBoxes({super.key});
+class LowerLabelInputBoxes extends StatefulWidget {
+  final String custname; // Pass customer name from parent widget
+  const LowerLabelInputBoxes({super.key, required this.custname});
+
+  @override
+  _LowerLabelInputBoxesState createState() => _LowerLabelInputBoxesState();
+}
+
+class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
+  // Default content for the input boxes
+  String tarikhContent = 'dateContent';
+  String jumlahContent = 'priceContent';
+  String pakejContent = 'packageContent';
+  String bayaranContent = 'paymentContent';
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              LowerLabelInputBox(label: 'Nama'),
-              SizedBox(height: 6),
-              LowerLabelInputBox(label: 'Tarikh'),
-              SizedBox(height: 6),
-              LowerLabelInputBox(label: 'Jumlah'),
+              LowerLabelInputBox(
+                label: 'Nama',
+                content: widget.custname, // Use custname passed from parent
+              ),
+              const SizedBox(height: 6),
+              LowerLabelInputBox(
+                label: 'Tarikh',
+                content: tarikhContent,
+                onSave: (newContent) {
+                  setState(() {
+                    tarikhContent = newContent;
+                  });
+                },
+              ),
+              const SizedBox(height: 6),
+              LowerLabelInputBox(
+                label: 'Jumlah',
+                content: jumlahContent,
+                onSave: (newContent) {
+                  setState(() {
+                    jumlahContent = newContent;
+                  });
+                },
+              ),
             ],
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              LowerLabelInputBox(label: 'Pakej'),
-              SizedBox(height: 6),
-              LowerLabelInputBox(label: 'Penginapan'),
-              SizedBox(height: 6),
-              LowerLabelInputBox(label: 'Bayaran'),
+              LowerLabelInputBox(
+                label: 'Pakej',
+                content: pakejContent,
+                onSave: (newContent) {
+                  setState(() {
+                    pakejContent = newContent;
+                  });
+                },
+              ),
+              const SizedBox(height: 6),
+              LowerLabelInputBox(
+                label: 'Penginapan',
+                content: bayaranContent,
+                onSave: (newContent) {
+                  setState(() {
+                    bayaranContent = newContent;
+                  });
+                },
+              ),
+              const SizedBox(height: 6),
+              LowerLabelInputBox(
+                label: 'Bayaran',
+                content: 'Paid', // Static content
+              ),
             ],
           ),
         ),
       ],
     );
   }
+
+  // Method to update the input fields when called from ReceiptDetails
+  void updateFields(String tarikh, String jumlah, String pakej, String bayaran) {
+    setState(() {
+      tarikhContent = tarikh;
+      jumlahContent = jumlah;
+      pakejContent = pakej;
+      bayaranContent = bayaran;
+    });
+  }
 }
+
+
 
 class LowerLabelInputBox extends StatelessWidget {
   final String label;
+  final String content;
+  final Function(String)? onSave;
 
-  const LowerLabelInputBox({super.key, required this.label});
+  const LowerLabelInputBox({
+    super.key,
+    required this.label,
+    required this.content,
+    this.onSave,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: Text(
-            '$label:',
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        Text(label),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: () {
+            _showPopup(context, label, content, onSave);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.blue),
+            ),
+            child: Text(content),
           ),
-        ),
-        TextFormField(
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          ),
-          style: const TextStyle(fontSize: 10),
         ),
       ],
+    );
+  }
+
+  void _showPopup(BuildContext context, String title, String initialContent, Function(String)? onSave) {
+    TextEditingController controller = TextEditingController(text: initialContent);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit $title'),
+          content: TextField(
+            controller: controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Enter new $title details',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newContent = controller.text;
+                if (onSave != null) {
+                  onSave(newContent); // Call onSave to update the content
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 class CustomInputField extends StatelessWidget {
-  final String? initialValue;
+  final TextEditingController? controller;
   final String? hintText;
 
-  const CustomInputField({super.key, this.initialValue, this.hintText});
+  const CustomInputField({
+    Key? key,
+    this.controller,
+    required this.hintText,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       keyboardType: TextInputType.multiline,
       maxLines: null,
-      initialValue: initialValue,
+      controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(
