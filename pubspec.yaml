@@ -36,7 +36,7 @@ dependencies:
   cloud_firestore:
   url_launcher: ^6.1.7
   flutter_dotenv: ^5.0.2
-
+  uuid:
   pdf: ^3.6.0
   printing: ^5.7.0
 
