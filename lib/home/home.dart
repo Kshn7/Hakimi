@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:homestay_form/pelanggan/senarai_pelanggan.dart';
 
 import '../calendar/calendar.dart';
 import '../profile/profile.dart';
@@ -25,8 +26,8 @@ class HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const BookingCalendarPage(),
-    ReceiptGenerator(),
-    const Center(child: Text('Senarai Pelanggan Page')),
+    const ReceiptGenerator(),
+    const SenaraiPelanggan(),
     const Center(child: Text('Senarai Resit Page')),
     const ProfilePage(),
   ];
@@ -45,9 +46,7 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Colors.blue,
         actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
       ),
-      body: SingleChildScrollView(
-        child: Center(child: _widgetOptions[_selectedIndex]),
-      ),
+      body: Center(child: _widgetOptions[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

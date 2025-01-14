@@ -71,7 +71,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Container(
               color: Colors.purple,
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -131,7 +131,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
               ),
             ),
             const SizedBox(height: 8),
-            Flexible(
+            Expanded(
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const ClampingScrollPhysics(),
@@ -197,7 +197,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -219,7 +219,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
