@@ -140,12 +140,13 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       backgroundColor: Colors.blue,
                       padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02,
-                          horizontal: screenWidth * 0.2),
+                          vertical: screenHeight * 0.015,
+                          horizontal: screenWidth * 0.15),
+                           minimumSize: Size(screenWidth * 0.4, 40), 
                     ),
                     child: Text(
                       _forgot
@@ -154,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? 'Daftar'
                               : 'Log Masuk',
                       style: TextStyle(
-                          fontSize: screenWidth * 0.045, color: Colors.white),
+                          fontSize: screenWidth * 0.04, color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),
