@@ -38,58 +38,50 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     double screenWidth = MediaQuery.of(context).size.width;
-     bool isWebLayout = MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
+    bool isWebLayout =
+        MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
 
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(_tabTitles[_selectedIndex]),
         backgroundColor: Colors.blue,
         actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
       ),
-
       body: Center(
-      child: Container(
-      width: isWebLayout ?400 : double.infinity,
-      padding: EdgeInsets.all(isWebLayout?20 : 10),
-
-      child: Column(
-
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-           children: [
-              Expanded(child:_widgetOptions[_selectedIndex]),
-              SizedBox(height:20),
+        child: Container(
+          width: isWebLayout ? 400 : double.infinity,
+          padding: EdgeInsets.all(isWebLayout ? 20 : 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: _widgetOptions[_selectedIndex]),
+              SizedBox(height: 20),
               SizedBox(
-
                 width: isWebLayout ? 400 : double.infinity,
-                child: ElevatedButton( onPressed: () {},
-                style: ElevatedButton.styleFrom (
-                padding: EdgeInsets.symmetric(
-                 vertical: isWebLayout?  16 : 12,),
-                textStyle: TextStyle(fontSize: isWebLayout?  18 : 14),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: isWebLayout ? 16 : 12,
+                    ),
+                    textStyle: TextStyle(fontSize: isWebLayout ? 18 : 14),
                   ),
-
-      child: Text("Submit"),
-
-
-       ),
+                  child: Text("Submit"),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      ],
-    ),
-  ),
-),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Booking Calendar',
           ),
-     
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt),
             label: 'Receipt Generator',
@@ -107,7 +99,6 @@ class HomePageState extends State<HomePage> {
             label: 'Homestay Profile',
           ),
         ],
-
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
@@ -115,12 +106,11 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-void _logout() async {
-  await FirebaseAuth.instance.signOut();
-  if (mounted) {
-    Navigator.pushReplacementNamed(context, '/login'); //bring user to login
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login'); //bring user to login
+    }
   }
 }
-
