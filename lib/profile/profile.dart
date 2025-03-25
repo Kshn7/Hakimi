@@ -122,7 +122,7 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit, color: Colors.grey),
+          icon: Icon(isEditing ? Icons.check : Icons.edit, color: Colors.grey),
           onPressed: onEdit,
         ),
       ],
