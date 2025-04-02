@@ -38,14 +38,7 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-<<<<<<< HEAD
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isWebLayout =
-        MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
-=======
-  //changed 
+  //changed
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     if (mounted) {
@@ -56,7 +49,6 @@ class HomePageState extends State<HomePage> {
   @override //also changed
   Widget build(BuildContext context) {
     bool isWebLayout = MediaQuery.of(context).size.aspectRatio > 1;
->>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +78,8 @@ class HomePageState extends State<HomePage> {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: isWebLayout ? 16 : 12),
+                    padding:
+                        EdgeInsets.symmetric(vertical: isWebLayout ? 16 : 12),
                     textStyle: TextStyle(fontSize: isWebLayout ? 18 : 14),
                   ),
                   child: Text("Submit"),
@@ -126,14 +119,4 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-<<<<<<< HEAD
-
-  void _logout() async {
-    await FirebaseAuth.instance.signOut();
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login'); //bring user to login
-    }
-  }
-=======
->>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 }

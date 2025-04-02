@@ -56,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void addUser(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Account created successfully!")),
       );
@@ -78,20 +79,12 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //////////////
-
   @override
   Widget build(BuildContext context) {
     // Get the width and height of the device screen using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-<<<<<<< HEAD
-    bool isWebLayout =
-        MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
-=======
 
-    // Change the scrollbar
->>>>>>> 9f37067 (changed button padding and fix thumbscroll)
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
       body: Center(
@@ -99,94 +92,111 @@ class _LoginPageState extends State<LoginPage> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
             child: Form(
-<<<<<<< HEAD
-              key: _formKey, // Assign the form key here
-              child: Container(
-                width: isWebLayout ? 400 : double.infinity,
-                padding: EdgeInsets.all(isWebLayout ? 20 : 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: screenWidth * 0.15,
-                      backgroundColor: Colors.white,
-                      child: Center(
-                        child: AutoSizeText(
-                          'Logo App',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.05,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-=======
-              key: _formKey, 
+              key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: screenWidth * 0.15,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      'Logo App',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.05,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
->>>>>>> 9f37067 (changed button padding and fix thumbscroll)
+                      radius: screenWidth * 0.15,
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        'Logo App',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.05,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                  SizedBox(height: screenHeight * 0.05),
+
+                  // Email TextField with validation
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Emel',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.05),
-
-                    // Email TextField with validation
+                    validator: validateEmail, // Updated with email validation
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  // Password TextField with validation
+                  if (!_forgot)
                     TextFormField(
-                      controller: _emailController,
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
-                        labelText: 'Emel',
+                        labelText: 'Kata Laluan',
                         filled: true,
                         fillColor: Colors.white,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      validator: validateEmail, // Updated with email validation
+                      validator:
+                          validatePassword, // Updated with password validation
                     ),
-                    SizedBox(height: screenHeight * 0.02),
+                  SizedBox(height: screenHeight * 0.05),
+                  // // Login Button
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     if (_formKey.currentState!.validate()) {
+                  //       // Validation passed
+                  //       if (_forgot) {
+                  //         resetPassword(_emailController.text);
+                  //       } else {
+                  //         _register
+                  //             ? addUser(
+                  //                 _emailController.text,
+                  //                 _passwordController.text,
+                  //               )
+                  //             : loginUser(
+                  //                 _emailController.text,
+                  //                 _passwordController.text,
+                  //               );
+                  //       }
+                  //     }
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20),
+                  //     ),
+                  //     // Changed this
+                  //     backgroundColor: Colors.blue,
+                  //     padding: EdgeInsets.symmetric(
+                  //         vertical: screenHeight * 0.02,
+                  //         horizontal: screenWidth * 0.05),
+                  //     minimumSize: Size(screenWidth * 0.6, 50),
+                  //   ),
+                  //   child: Text(
+                  //     _forgot
+                  //         ? 'Tetapkan semula'
+                  //         : _register
+                  //             ? 'Daftar'
+                  //             : 'Log Masuk',
+                  //     style: TextStyle(
+                  //         fontSize: screenWidth * 0.04, color: Colors.white),
+                  //     textAlign: TextAlign.center,
+                  //   ),
+                  // ),
 
-<<<<<<< HEAD
-                    // Password TextField with validation
-                    if (!_forgot)
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: InputDecoration(
-                          labelText: 'Kata Laluan',
-                          filled: true,
-                          fillColor: Colors.white,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        validator:
-                            validatePassword, // Updated with password validation
-                      ),
-                    SizedBox(height: screenHeight * 0.05),
-=======
                   // Login Button
                   ElevatedButton(
                     onPressed: () {
@@ -207,97 +217,52 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       }
                     },
-
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      // Changed this
                       backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02, horizontal: screenWidth * 0.05),
-                      minimumSize: Size(screenWidth * 0.6, 50),
+                      minimumSize: Size(screenWidth * 0.2, 40),
                     ),
-                    child: Text(
+                    child: AutoSizeText(
                       _forgot
                           ? 'Tetapkan semula'
                           : _register
                               ? 'Daftar'
                               : 'Log Masuk',
-                      style: TextStyle(
-                          fontSize: screenWidth * 0.04, color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),
->>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 
-                    // Login Button
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // Validation passed
-                          if (_forgot) {
-                            resetPassword(_emailController.text);
-                          } else {
-                            _register
-                                ? addUser(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  )
-                                : loginUser(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        backgroundColor: Colors.blue,
-                        minimumSize: Size(screenWidth * 0.2, 40),
-                      ),
-                      child: AutoSizeText(
-                        _forgot
-                            ? 'Tetapkan semula'
-                            : _register
-                                ? 'Daftar'
-                                : 'Log Masuk',
-                        style: TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // Additional Links
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _register = !_register;
+                        _forgot = false;
+                      });
+                    },
+                    child: Text(
+                      _register ? 'Log masuk' : 'Daftar Akaun Baru',
+                      style: const TextStyle(color: Colors.blue),
                     ),
-
-                    SizedBox(height: screenHeight * 0.03),
-
-                    // Additional Links
+                  ),
+                  if (!_forgot)
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          _register = !_register;
-                          _forgot = false;
+                          _forgot = true;
                         });
                       },
-                      child: Text(
-                        _register ? 'Log masuk' : 'Daftar Akaun Baru',
-                        style: const TextStyle(color: Colors.blue),
+                      child: const Text(
+                        'Terlupa Kata Laluan?',
+                        style: TextStyle(color: Colors.blue),
                       ),
                     ),
-                    if (!_forgot)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _forgot = true;
-                          });
-                        },
-                        child: const Text(
-                          'Terlupa Kata Laluan?',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
