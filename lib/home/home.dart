@@ -38,17 +38,38 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isWebLayout =
         MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
+=======
+  //changed 
+  void _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  @override //also changed
+  Widget build(BuildContext context) {
+    bool isWebLayout = MediaQuery.of(context).size.aspectRatio > 1;
+>>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_tabTitles[_selectedIndex]),
         backgroundColor: Colors.blue,
-        actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              _logout(context); //context passed here
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
       ),
       body: Center(
         child: Container(
@@ -58,15 +79,14 @@ class HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(child: _widgetOptions[_selectedIndex]),
-              SizedBox(height: 20),
+              const SizedBox(height: 20), //added const
+
               SizedBox(
                 width: isWebLayout ? 400 : double.infinity,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      vertical: isWebLayout ? 16 : 12,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: isWebLayout ? 16 : 12),
                     textStyle: TextStyle(fontSize: isWebLayout ? 18 : 14),
                   ),
                   child: Text("Submit"),
@@ -106,6 +126,7 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
+<<<<<<< HEAD
 
   void _logout() async {
     await FirebaseAuth.instance.signOut();
@@ -113,4 +134,6 @@ class HomePageState extends State<HomePage> {
       Navigator.pushReplacementNamed(context, '/login'); //bring user to login
     }
   }
+=======
+>>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 }

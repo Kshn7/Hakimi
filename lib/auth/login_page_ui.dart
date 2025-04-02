@@ -41,20 +41,65 @@ class _LoginPageState extends State<LoginPage> {
     return null; // No error
   }
 
+  // Add
+  void resetPassword(String email) {
+    _auth.sendPasswordResetEmail(email: email).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Reset link sent to $email")),
+      );
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${error.message}")),
+      );
+    });
+  }
+
+  void addUser(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Account created successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
+  void loginUser(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed: ${e.toString()}")),
+      );
+    }
+  }
+
+  //////////////
+
   @override
   Widget build(BuildContext context) {
     // Get the width and height of the device screen using MediaQuery
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+<<<<<<< HEAD
     bool isWebLayout =
         MediaQuery.of(context).size.aspectRatio > 1; //weblayout change
+=======
+
+    // Change the scrollbar
+>>>>>>> 9f37067 (changed button padding and fix thumbscroll)
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
             child: Form(
+<<<<<<< HEAD
               key: _formKey, // Assign the form key here
               child: Container(
                 width: isWebLayout ? 400 : double.infinity,
@@ -75,6 +120,21 @@ class _LoginPageState extends State<LoginPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+=======
+              key: _formKey, 
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: screenWidth * 0.15,
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      'Logo App',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+>>>>>>> 9f37067 (changed button padding and fix thumbscroll)
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.05),
@@ -95,6 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: screenHeight * 0.02),
 
+<<<<<<< HEAD
                     // Password TextField with validation
                     if (!_forgot)
                       TextFormField(
@@ -125,6 +186,50 @@ class _LoginPageState extends State<LoginPage> {
                             validatePassword, // Updated with password validation
                       ),
                     SizedBox(height: screenHeight * 0.05),
+=======
+                  // Login Button
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Validation passed
+                        if (_forgot) {
+                          resetPassword(_emailController.text);
+                        } else {
+                          _register
+                              ? addUser(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                )
+                              : loginUser(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                        }
+                      }
+                    },
+
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      // Changed this
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.02, horizontal: screenWidth * 0.05),
+                      minimumSize: Size(screenWidth * 0.6, 50),
+                    ),
+                    child: Text(
+                      _forgot
+                          ? 'Tetapkan semula'
+                          : _register
+                              ? 'Daftar'
+                              : 'Log Masuk',
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.04, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+>>>>>>> 9f37067 (changed button padding and fix thumbscroll)
 
                     // Login Button
                     ElevatedButton(
@@ -199,56 +304,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  Future<void> loginUser(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login Successful!')),
-      );
-      // Navigate to home page or another screen
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Failed: ${e.toString()}')),
-      );
-    }
-  }
-
-  Future<void> resetPassword(String email) async {
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email')),
-      );
-    } else {
-      try {
-        await _auth.sendPasswordResetEmail(email: email);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reset password send to email!')),
-        );
-      } on FirebaseAuthException catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(err.message.toString())),
-        );
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(err.toString())),
-        );
-      }
-    }
-  }
-
-  Future<void> addUser(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User Added Successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error Adding User: ${e.toString()}')),
-      );
-    }
   }
 }
