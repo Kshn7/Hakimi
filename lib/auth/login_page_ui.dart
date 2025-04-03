@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-g
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -17,6 +17,28 @@ class _LoginPageState extends State<LoginPage> {
   bool _register = false;
   bool _forgot = false;
   bool _isPasswordVisible = false;
+  // Email validation function using Regex
+  String? validateEmail(String? value) {
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    } else if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    return null; // No error
+  }
+
+  // Password validation function using Regex
+  String? validatePassword(String? value) {
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    } else if (!passwordRegex.hasMatch(value)) {
+      return 'Password must be at least 8 characters long with letters and numbers';
+    }
+    return null; // No error
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +52,14 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isWeb ? screenWidth * 0.2 : 20),
+            padding: EdgeInsets.symmetric(
+                horizontal: isWeb ? screenWidth * 0.1 : 20),
             child: Form(
               key: _formKey,
               child: Container(
-                width: isWeb || isTablet ? screenWidth * 0.6 : double.infinity,//tab
+                width: isWeb || isTablet
+                    ? screenWidth * 0.6
+                    : double.infinity, //tab
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +83,12 @@ class _LoginPageState extends State<LoginPage> {
 
                     // Email Field
                     SizedBox(
-                      width: isWeb ? screenWidth * 0.5 : isTablet ? screenWidth * 0.7 : double.infinity, //for mobile,tablet and web view
+                      width: isWeb
+                          ? screenWidth * 0.3
+                          : isTablet
+                              ? screenWidth * 0.7
+                              : double
+                                  .infinity, //for mobile,tablet and web view
                       child: TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -70,6 +100,8 @@ class _LoginPageState extends State<LoginPage> {
                             borderSide: BorderSide.none,
                           ),
                         ),
+                        validator:
+                            validateEmail, // Updated with email validation
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.02),
@@ -77,7 +109,11 @@ class _LoginPageState extends State<LoginPage> {
                     // Password Field
                     if (!_forgot)
                       SizedBox(
-                        width: isWeb ? screenWidth * 0.5 : isTablet ? screenWidth * 0.7 : double.infinity, //added here too
+                        width: isWeb
+                            ? screenWidth * 0.3
+                            : isTablet
+                                ? screenWidth * 0.7
+                                : double.infinity, //added here too
                         child: TextFormField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
@@ -87,7 +123,9 @@ class _LoginPageState extends State<LoginPage> {
                             fillColor: Colors.white,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -100,13 +138,19 @@ class _LoginPageState extends State<LoginPage> {
                               borderSide: BorderSide.none,
                             ),
                           ),
+                          validator:
+                              validatePassword, // Updated with password validation
                         ),
                       ),
                     SizedBox(height: screenHeight * 0.05),
 
                     // Login Button
                     SizedBox(
-                      width: isWeb ? screenWidth * 0.4 : isTablet ? screenWidth * 0.6 : double.infinity, 
+                      width: isWeb
+                          ? screenWidth * 0.3
+                          : isTablet
+                              ? screenWidth * 0.6
+                              : double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
@@ -121,7 +165,11 @@ class _LoginPageState extends State<LoginPage> {
                           minimumSize: Size(screenWidth * 0.2, 50),
                         ),
                         child: AutoSizeText(
-                          _forgot ? 'Tetapkan semula' : _register ? 'Daftar' : 'Log Masuk',
+                          _forgot
+                              ? 'Tetapkan semula'
+                              : _register
+                                  ? 'Daftar'
+                                  : 'Log Masuk',
                           style: TextStyle(color: Colors.white, fontSize: 18),
                           textAlign: TextAlign.center,
                         ),
