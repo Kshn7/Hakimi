@@ -26,13 +26,19 @@ class _SenaraiPelangganState extends State<SenaraiPelanggan> {
                 .orderBy('name'.toLowerCase())
                 .snapshots(),
             builder: (context, snapshot) {
-              return snapshot.data == null || snapshot.data!.docs.isEmpty
-                  ? const Text("No data. Add new customer detail")
-                  : Flexible(
+              if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                return const Text("No data. Add new customer detail");
+              }
+                  return SizedBox(
+                      width: MediaQuery.of(context).size.width*0.2, // **Limits width to 25% of screen width**
+                      height: MediaQuery.of(context).size.height*0.7, // **Limits width to 70% of screen width**
+                    child: Flexible(
                       child: ListView.builder(
+
                         padding: EdgeInsets.all(8),
                         itemCount: snapshot.data!.size,
-                        shrinkWrap: true,
+                        shrinkWrap: false,
+                        physics: const AlwaysScrollableScrollPhysics(), // Smooth scrolling
                         itemBuilder: (context, index) {
                           var data = snapshot.data!.docs[index];
                           return Card(
@@ -41,16 +47,47 @@ class _SenaraiPelangganState extends State<SenaraiPelanggan> {
                               title: Text(data['name']),
                               subtitle: Text(data['phoneNumber']),
                               trailing: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    //Delete customer from Firestore
+                                    bool? confirmDelete = await showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text("Delete Customer"),
+                                        content: const Text("Are you sure you want to delete this customer?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, false), // Cancel
+                                            child: const Text("Cancel"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, true), // Confirm delete
+                                            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    if (confirmDelete == true) {
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                                          .collection('customers')
+                                          .doc(data.id)
+                                          .delete();
+                                    }
+
+                                  },
                                   icon: const Icon(
                                     Icons.remove_circle,
                                     color: Colors.red,
-                                  )),
+                                  ),
+                              ),
                             ),
                           );
                         },
                       ),
-                    );
+                    ),
+                );
             }),
         const Spacer(),
         Padding(
