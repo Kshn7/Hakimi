@@ -154,7 +154,20 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Validation logic
+                            // Validation passed
+                            if (_forgot) {
+                              resetPassword(_emailController.text);
+                            } else {
+                              _register
+                                  ? addUser(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                    )
+                                  : loginUser(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                    );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -211,5 +224,56 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> loginUser(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Successful!')),
+      );
+      // Navigate to home page or another screen
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login Failed: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email')),
+      );
+    } else {
+      try {
+        await _auth.sendPasswordResetEmail(email: email);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Reset password send to email!')),
+        );
+      } on FirebaseAuthException catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(err.message.toString())),
+        );
+      } catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(err.toString())),
+        );
+      }
+    }
+  }
+
+  Future<void> addUser(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User Added Successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error Adding User: ${e.toString()}')),
+      );
+    }
   }
 }
