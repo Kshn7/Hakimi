@@ -38,15 +38,56 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  @override
+  //changed 
+  void _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  @override //also changed
   Widget build(BuildContext context) {
+    bool isWebLayout = MediaQuery.of(context).size.aspectRatio > 1;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_tabTitles[_selectedIndex]),
         backgroundColor: Colors.blue,
-        actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              _logout(context); //context passed here
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
       ),
-      body: Center(child: _widgetOptions[_selectedIndex]),
+      body: Center(
+        child: Container(
+          width: isWebLayout ? 400 : double.infinity,
+          padding: EdgeInsets.all(isWebLayout ? 20 : 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: _widgetOptions[_selectedIndex]),
+              const SizedBox(height: 20), //added const
+
+              SizedBox(
+                width: isWebLayout ? 400 : double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: isWebLayout ? 16 : 12),
+                    textStyle: TextStyle(fontSize: isWebLayout ? 18 : 14),
+                  ),
+                  child: Text("Submit"),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -77,8 +118,4 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-void _logout() {
-  FirebaseAuth.instance.signOut();
 }
