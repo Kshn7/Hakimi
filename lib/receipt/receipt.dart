@@ -24,76 +24,98 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
   String custnumber = '';
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RepaintBoundary(key: key, child: const BigBox(custname: '',)),
-          const SizedBox(height: 10),
-          const Center(
-            child: Text(
-              'Preview',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 8),
-          CustomInputField(
-            controller: _custNameController,
-            hintText: 'Customer details',
-          ),
-          const SizedBox(height: 6),
-          CustomInputField(
-            controller: _custNumberController,
-            hintText: 'Customer number',
-          ),
-          const SizedBox(height: 12),
-          const ReceiptDetails(),
-          const SizedBox(height: 24),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  custname = _custNameController.text;
-                  custnumber = _custNumberController.text;
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Receipt Generator'),
+      backgroundColor: Colors.blue,
+    ),
+    body: LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RepaintBoundary(
+                      key: key,
+                      child: BigBox(custname: custname),
+                    ),
+                    const SizedBox(height: 10),
+                    const Center(
+                      child: Text(
+                        'Preview',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    CustomInputField(
+                      controller: _custNameController,
+                      hintText: 'Customer details',
+                    ),
+                    const SizedBox(height: 6),
+                    CustomInputField(
+                      controller: _custNumberController,
+                      hintText: 'Customer number',
+                    ),
+                    const SizedBox(height: 12),
+                    const ReceiptDetails(),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            custname = _custNameController.text;
+                            custnumber = _custNumberController.text;
+                          });
 
-                });
-
-                print('Customer Name: $custname');
-                print('Customer Number: $custnumber');
-              },
-              child: const Text('Save Details'),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Generate button
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: () {
-                //generate receipt as pdf
-                _generateAndPrintPDF();
-              },
-              icon: const Icon(Icons.autorenew, color: Colors.white, size: 12),
-              label: const Text(
-                'Generate',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                          print('Customer Name: $custname');
+                          print('Customer Number: $custnumber');
+                        },
+                        child: const Text('Save Details'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          _generateAndPrintPDF();
+                        },
+                        icon: const Icon(Icons.autorenew,
+                            color: Colors.white, size: 12),
+                        label: const Text(
+                          'Generate',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-              ),
             ),
-
           ),
-        ],
+        );
+      },
+    ),
+  );
+}
 
-      ),
-    );
-  }
 
 // Function to generate and print PDF
   void _generateAndPrintPDF() async {
@@ -322,111 +344,117 @@ class BigBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Homestay',
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'No. 3, Jalan Yoga 13/42,\nSeksyen 13, 40100 Shah Alam,\nSelangor',
-                            style: TextStyle(fontSize: 10),
-                          ),
-                          SizedBox(height: 2),
-                          Text('WhatsApp +60123456789',
-                              style: TextStyle(fontSize: 10)),
-                          SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Text('No: ......................',
-                                  style: TextStyle(fontSize: 10)),
-                              SizedBox(width: 8),
-                              Text('Tarikh: ...............................',
-                                  style: TextStyle(fontSize: 10)),
-                            ],
-                          ),
-                        ],
+    // Get screen width to apply responsive max width
+    double screenWidth = MediaQuery.of(context).size.width;
+    double maxWidth = screenWidth > 600 ? 800 : double.infinity;
+
+    return Center(
+      child: Container(
+        width: maxWidth,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 1.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Homestay',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'No. 3, Jalan Yoga 13/42,\nSeksyen 13, 40100 Shah Alam,\nSelangor',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                            SizedBox(height: 2),
+                            Text('WhatsApp +60123456789',
+                                style: TextStyle(fontSize: 10)),
+                            SizedBox(height: 2),
+                            Row(
+                              children: [
+                                Text('No: ......................',
+                                    style: TextStyle(fontSize: 10)),
+                                SizedBox(width: 8),
+                                Text('Tarikh: ...............................',
+                                    style: TextStyle(fontSize: 10)),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 40,
-                      width: 40,
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.home,
-                        size: 20,
+
+                      Container(
+                        height: 40,
+                        width: 40,
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.home,
+                          size: 20,
+                        ),
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+                  LowerLabelInputBoxes(
+                    custname: custname, // Retrieve the value dynamically
+                  ),
+                  const SizedBox(height: 4),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Resit ini adalah cetakan komputer',
+                      style: TextStyle(fontSize: 10, color: Colors.black54),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              LowerLabelInputBoxes(
-                custname: custname, // Retrieve the value dynamically
+                  ),
+                ],
               ),
-
-                // const SizedBox(height: 10),
-                // const ResitRasmiButton(),
-                const SizedBox(height: 4),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Resit ini adalah cetakan komputer',
-                    style: TextStyle(fontSize: 10, color: Colors.black54),
-                  ),
-
-                ),
-              ],
             ),
-          ),
-          Container(
-            width: double.infinity,
-            color: Colors.blueAccent,
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Icon(Icons.music_note, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Icon(Icons.facebook, color: Colors.white, size: 20),
-                SizedBox(width: 8),
-                Icon(Icons.play_circle_filled, color: Colors.white, size: 20),
-                SizedBox(width: 12),
-                Text(
-                  '@ASTANA_RIA_DRAJA',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+            Container(
+              width: double.infinity,
+              color: Colors.blueAccent,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Icon(Icons.music_note, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Icon(Icons.facebook, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Icon(Icons.play_circle_filled, color: Colors.white, size: 20),
+                  SizedBox(width: 12),
+                  Text(
+                    '@ASTANA_RIA_DRAJA',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class LowerLabelInputBoxes extends StatefulWidget {
   final String custname; // Pass customer name from parent widget

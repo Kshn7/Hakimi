@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:homestay_form/auth/login_page_ui.dart';
 import 'package:homestay_form/calendar/calendar.dart';
 import 'package:homestay_form/landing/landing.dart';
+import 'package:homestay_form/receipt/receipt.dart';
 
 import 'firebase_options.dart';
 
@@ -26,11 +27,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LandingPage(), // Changed to LoginPage
+      home: const ReceiptGenerator(), // Changed to Receipt for testing
       debugShowCheckedModeBanner: false,
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/calendar': (context) => const BookingCalendarPage(),
+        '/receipt': (context) => const ReceiptGenerator(),
       },
     );
   }
