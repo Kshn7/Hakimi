@@ -71,20 +71,7 @@ class HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(child: _widgetOptions[_selectedIndex]),
-              const SizedBox(height: 20), //added const
-
-              SizedBox(
-                width: isWebLayout ? 400 : double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding:
-                        EdgeInsets.symmetric(vertical: isWebLayout ? 16 : 12),
-                    textStyle: TextStyle(fontSize: isWebLayout ? 18 : 14),
-                  ),
-                  child: Text("Submit"),
-                ),
-              ),
+              const SizedBox(height: 20), //added const,
             ],
           ),
         ),

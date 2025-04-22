@@ -23,99 +23,98 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
   String custname = '';
   String custnumber = '';
 
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Receipt Generator'),
-      backgroundColor: Colors.blue,
-    ),
-    body: LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RepaintBoundary(
-                      key: key,
-                      child: BigBox(custname: custname),
-                    ),
-                    const SizedBox(height: 10),
-                    const Center(
-                      child: Text(
-                        'Preview',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RepaintBoundary(
+                        key: key,
+                        child: BigBox(custname: custname),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    CustomInputField(
-                      controller: _custNameController,
-                      hintText: 'Customer details',
-                    ),
-                    const SizedBox(height: 6),
-                    CustomInputField(
-                      controller: _custNumberController,
-                      hintText: 'Customer number',
-                    ),
-                    const SizedBox(height: 12),
-                    const ReceiptDetails(),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            custname = _custNameController.text;
-                            custnumber = _custNumberController.text;
-                          });
-
-                          print('Customer Name: $custname');
-                          print('Customer Number: $custnumber');
-                        },
-                        child: const Text('Save Details'),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          _generateAndPrintPDF();
-                        },
-                        icon: const Icon(Icons.autorenew,
-                            color: Colors.white, size: 12),
-                        label: const Text(
-                          'Generate',
+                      const SizedBox(height: 10),
+                      const Center(
+                        child: Text(
+                          'Preview',
                           style: TextStyle(
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      CustomInputField(
+                        controller: _custNameController,
+                        hintText: 'Customer details',
+                      ),
+                      const SizedBox(height: 6),
+                      CustomInputField(
+                        controller: _custNumberController,
+                        hintText: 'Customer number',
+                      ),
+                      const SizedBox(height: 12),
+                      const ReceiptDetails(),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  custname = _custNameController.text;
+                                  custnumber = _custNumberController.text;
+                                });
+
+                                print('Customer Name: $custname');
+                                print('Customer Number: $custnumber');
+                              },
+                              child: const Text('Save Details'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Center(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                _generateAndPrintPDF();
+                              },
+                              icon: const Icon(Icons.autorenew,
+                                  color: Colors.white, size: 12),
+                              label: const Text(
+                                'Generate',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    ),
-  );
-}
-
+          );
+        },
+      ),
+    );
+  }
 
 // Function to generate and print PDF
   void _generateAndPrintPDF() async {
@@ -150,7 +149,7 @@ Widget build(BuildContext context) {
 
   Future<Uint8List> _captureWidgetToImage(GlobalKey key) async {
     RenderRepaintBoundary boundary =
-    key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
     var image = await boundary.toImage(pixelRatio: 3.0);
     ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
     return byteData!.buffer.asUint8List();
@@ -185,7 +184,7 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
               context: context,
               onSave: (newContent) {
                 setState(() {
-                  packageContent = newContent;  // Update the content state
+                  packageContent = newContent; // Update the content state
                 });
               },
             ),
@@ -196,7 +195,7 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
               context: context,
               onSave: (newContent) {
                 setState(() {
-                  paymentContent = newContent;  // Update the content state
+                  paymentContent = newContent; // Update the content state
                 });
               },
             ),
@@ -207,7 +206,7 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
               context: context,
               onSave: (newContent) {
                 setState(() {
-                  priceContent = newContent;  // Update the content state
+                  priceContent = newContent; // Update the content state
                 });
               },
             ),
@@ -218,7 +217,7 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
               context: context,
               onSave: (newContent) {
                 setState(() {
-                  dateContent = newContent;  // Update the content state
+                  dateContent = newContent; // Update the content state
                 });
               },
             ),
@@ -298,8 +297,10 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
     );
   }
 
-  void _showPopup(BuildContext context, String title, String initialContent, Function(String) onSave) {
-    TextEditingController controller = TextEditingController(text: initialContent);
+  void _showPopup(BuildContext context, String title, String initialContent,
+      Function(String) onSave) {
+    TextEditingController controller =
+        TextEditingController(text: initialContent);
 
     showDialog(
       context: context,
@@ -336,10 +337,9 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
   }
 }
 
-
-
 class BigBox extends StatelessWidget {
   final String custname;
+
   const BigBox({super.key, required this.custname});
 
   @override
@@ -394,7 +394,6 @@ class BigBox extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       Container(
                         height: 40,
                         width: 40,
@@ -406,7 +405,6 @@ class BigBox extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
                   LowerLabelInputBoxes(
                     custname: custname, // Retrieve the value dynamically
@@ -454,7 +452,6 @@ class BigBox extends StatelessWidget {
     );
   }
 }
-
 
 class LowerLabelInputBoxes extends StatefulWidget {
   final String custname; // Pass customer name from parent widget
@@ -544,7 +541,8 @@ class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
   }
 
   // Method to update the input fields when called from ReceiptDetails
-  void updateFields(String tarikh, String jumlah, String pakej, String bayaran) {
+  void updateFields(
+      String tarikh, String jumlah, String pakej, String bayaran) {
     setState(() {
       tarikhContent = tarikh;
       jumlahContent = jumlah;
@@ -553,8 +551,6 @@ class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
     });
   }
 }
-
-
 
 class LowerLabelInputBox extends StatelessWidget {
   final String label;
@@ -593,8 +589,10 @@ class LowerLabelInputBox extends StatelessWidget {
     );
   }
 
-  void _showPopup(BuildContext context, String title, String initialContent, Function(String)? onSave) {
-    TextEditingController controller = TextEditingController(text: initialContent);
+  void _showPopup(BuildContext context, String title, String initialContent,
+      Function(String)? onSave) {
+    TextEditingController controller =
+        TextEditingController(text: initialContent);
 
     showDialog(
       context: context,
