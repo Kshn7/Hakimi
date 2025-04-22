@@ -40,6 +40,7 @@ dependencies:
   pdf: ^3.6.0
   printing: ^5.7.0
   auto_size_text:
+  shared_preferences:
 
 
   # The following adds the Cupertino Icons font to your application.

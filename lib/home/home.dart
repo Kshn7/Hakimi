@@ -65,15 +65,9 @@ class HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Container(
-          width: isWebLayout ? 400 : double.infinity,
+          width: isWebLayout ? 800 : double.infinity,
           padding: EdgeInsets.all(isWebLayout ? 20 : 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: _widgetOptions[_selectedIndex]),
-              const SizedBox(height: 20), //added const,
-            ],
-          ),
+          child: _widgetOptions[_selectedIndex],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

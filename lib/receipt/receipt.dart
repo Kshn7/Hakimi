@@ -28,80 +28,99 @@ class _ReceiptGeneratorState extends State<ReceiptGenerator> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
-                ),
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
+            ),
+            child: SingleChildScrollView(
+              child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Wrap(
+                    runSpacing: 10,
+                    spacing: 10,
                     children: [
-                      RepaintBoundary(
-                        key: key,
-                        child: BigBox(custname: custname),
-                      ),
-                      const SizedBox(height: 10),
-                      const Center(
-                        child: Text(
-                          'Preview',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      CustomInputField(
-                        controller: _custNameController,
-                        hintText: 'Customer details',
-                      ),
-                      const SizedBox(height: 6),
-                      CustomInputField(
-                        controller: _custNumberController,
-                        hintText: 'Customer number',
-                      ),
-                      const SizedBox(height: 12),
-                      const ReceiptDetails(),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  custname = _custNameController.text;
-                                  custnumber = _custNumberController.text;
-                                });
-
-                                print('Customer Name: $custname');
-                                print('Customer Number: $custnumber');
-                              },
-                              child: const Text('Save Details'),
+                          const SizedBox(height: 10),
+                          const Center(
+                            child: Text(
+                              'Form',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Center(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                _generateAndPrintPDF();
-                              },
-                              icon: const Icon(Icons.autorenew,
-                                  color: Colors.white, size: 12),
-                              label: const Text(
-                                'Generate',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                          const SizedBox(height: 8),
+                          CustomInputField(
+                            controller: _custNameController,
+                            hintText: 'Customer details',
+                          ),
+                          const SizedBox(height: 6),
+                          CustomInputField(
+                            controller: _custNumberController,
+                            hintText: 'Customer number',
+                          ),
+                          const SizedBox(height: 12),
+                          const ReceiptDetails(),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      custname = _custNameController.text;
+                                      custnumber = _custNumberController.text;
+                                    });
+
+                                    print('Customer Name: $custname');
+                                    print('Customer Number: $custnumber');
+                                  },
+                                  child: const Text('Save Details'),
                                 ),
                               ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
+                              const SizedBox(width: 12),
+                              Center(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    _generateAndPrintPDF();
+                                  },
+                                  icon: const Icon(Icons.autorenew,
+                                      color: Colors.white, size: 12),
+                                  label: const Text(
+                                    'Generate',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          const Center(
+                            child: Text(
+                              'Preview',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                          ),
+                          RepaintBoundary(
+                            key: key,
+                            child: BigBox(custname: custname),
                           ),
                         ],
                       ),
@@ -234,7 +253,7 @@ class _ReceiptDetailsState extends State<ReceiptDetails> {
     required Function(String) onSave, // Callback for saving the new content
   }) {
     return Container(
-      width: 100,
+      width: 160,
       height: 60,
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
@@ -346,7 +365,7 @@ class BigBox extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get screen width to apply responsive max width
     double screenWidth = MediaQuery.of(context).size.width;
-    double maxWidth = screenWidth > 600 ? 800 : double.infinity;
+    double maxWidth = screenWidth > 600 ? 1000 : double.infinity;
 
     return Center(
       child: Container(
