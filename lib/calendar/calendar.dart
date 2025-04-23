@@ -156,7 +156,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
             itemCount: daysInMonth + firstDayIndex,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              childAspectRatio: 2,
+              childAspectRatio: 1.3,
             ),
             itemBuilder: (context, index) {
               final day =
@@ -166,8 +166,7 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                   ? "$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}"
                   : null;
 
-              final isHoliday =
-                  dateKey != null && holidayDates.contains(dateKey);
+              final isHoliday = dateKey != null && holidayDates.any((holiday) => holiday.dateIso == dateKey);
 
               return GestureDetector(
                 onTap: day != null
@@ -182,12 +181,12 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: day == selectedDay
-                        ? Colors.green[100]
-                        : isHoliday
-                            ? Colors.red[100]
-                            : day == DateTime.now().day &&
-                                    month == DateTime.now().month &&
-                                    year == DateTime.now().year
+                          ? Colors.green[100]
+                          : isHoliday
+                              ? Colors.red[100]
+                              : day == DateTime.now().day &&
+                                      month == DateTime.now().month &&
+                                      year == DateTime.now().year
                                 ? Colors.grey
                                 : holidayDates.any(
                                         (e) => e.dateIso == "$day-$month-$year")
