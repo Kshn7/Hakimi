@@ -592,7 +592,11 @@ class LowerLabelInputBox extends StatelessWidget {
         const SizedBox(height: 4),
         GestureDetector(
           onTap: () {
-            _showPopup(context, label, content, onSave);
+            if (label == 'Tarikh') {
+              _showDatePicker(context, label, content, onSave); // Open date picker for Tarikh
+            } else {
+              _showPopup(context, label, content, onSave); // Other fields open popup
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(12),
@@ -648,6 +652,27 @@ class LowerLabelInputBox extends StatelessWidget {
       },
     );
   }
+
+  void _showDatePicker(BuildContext context, String title, String initialContent, Function(String)? onSave) {
+    DateTime initialDate = DateTime.now();
+    if (initialContent != 'dateContent') {
+      initialDate = DateTime.parse(initialContent);
+    }
+
+    showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ).then((selectedDate) {
+      if (selectedDate != null) {
+        String formattedDate = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+        if (onSave != null) {
+          onSave(formattedDate); // Call onSave to update the content
+        }
+      }
+    });
+  }
 }
 
 class CustomInputField extends StatelessWidget {
@@ -684,17 +709,45 @@ class ResitRasmiButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
+      child: FixedSizeButton(
+        text: 'RESIT RASMI',
+        onPressed: () {
+        
+        },
+      ),
+    );
+  }
+}
+
+class FixedSizeButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const FixedSizeButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150, 
+      height: 50, 
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-        child: const Text(
-          'RESIT RASMI',
-          style: TextStyle(
+        child: Text(
+          text,
+          style: const TextStyle(
             color: Colors.white,
-            fontSize: 10,
+            fontSize: 14, 
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -702,3 +755,4 @@ class ResitRasmiButton extends StatelessWidget {
     );
   }
 }
+
