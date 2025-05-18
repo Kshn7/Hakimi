@@ -4,7 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/widgets.dart'
+    as pw; // Add pdf package for handling printing
 import 'package:printing/printing.dart';
 
 class ReceiptGenerator extends StatefulWidget {
@@ -15,477 +16,476 @@ class ReceiptGenerator extends StatefulWidget {
 }
 
 class _ReceiptGeneratorState extends State<ReceiptGenerator> {
-  // Create a GlobalKey to capture the widget
-  final key = GlobalKey();
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _custNameController = TextEditingController();
   final TextEditingController _custNumberController = TextEditingController();
+  final TextEditingController _packageNameController = TextEditingController();
+  final TextEditingController _packagePriceController = TextEditingController();
 
   String custname = '';
   String custnumber = '';
+  String packageName = '';
+  String packagePrice = '';
+  String receiptNumber = DateTime.now().millisecondsSinceEpoch.toString();
+  bool isDetailsSaved = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: constraints.maxWidth > 600 ? 800 : double.infinity,
-            ),
-            child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Wrap(
-                    runSpacing: 10,
-                    spacing: 10,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          const Center(
-                            child: Text(
-                              'Form',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          CustomInputField(
-                            controller: _custNameController,
-                            hintText: 'Customer details',
-                          ),
-                          const SizedBox(height: 6),
-                          CustomInputField(
-                            controller: _custNumberController,
-                            hintText: 'Customer number',
-                          ),
-                          const SizedBox(height: 12),
-                          const ReceiptDetails(),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      custname = _custNameController.text;
-                                      custnumber = _custNumberController.text;
-                                    });
-
-                                    print('Customer Name: $custname');
-                                    print('Customer Number: $custnumber');
-                                  },
-                                  child: const Text('Save Details'),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Center(
-                                child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    _generateAndPrintPDF();
-                                  },
-                                  icon: const Icon(Icons.autorenew,
-                                      color: Colors.white, size: 12),
-                                  label: const Text(
-                                    'Generate',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text(
-                              'Preview',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          RepaintBoundary(
-                            key: key,
-                            child: BigBox(custname: custname),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-// Function to generate and print PDF
-  void _generateAndPrintPDF() async {
-    final pdf = pw.Document();
-
-    // Wait for the widget to be painted and then capture the image
-    await Future.delayed(Duration(milliseconds: 100));
-
-    // Capture the image as a byte array
-    final imageBytes = await _captureWidgetToImage(key);
-
-    // Add a page to the PDF and insert the captured image
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Image(pw.MemoryImage(
-              imageBytes,
-            )),
-          );
-        },
-      ),
-    );
-
-    // Use the printing package to preview and print the PDF
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async {
-        return pdf.save(); // Return the PDF bytes to print or preview
-      },
-    );
-  } // Function to capture the widget as an image in bytes
-
-  Future<Uint8List> _captureWidgetToImage(GlobalKey key) async {
-    RenderRepaintBoundary boundary =
-        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    var image = await boundary.toImage(pixelRatio: 3.0);
-    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
-    return byteData!.buffer.asUint8List();
-  }
-}
-
-class ReceiptDetails extends StatefulWidget {
-  const ReceiptDetails({super.key});
-
-  @override
-  _ReceiptDetailsState createState() => _ReceiptDetailsState();
-}
-
-class _ReceiptDetailsState extends State<ReceiptDetails> {
-  // Define state variables for each box's content
-  String packageContent = '';
-  String paymentContent = '';
-  String priceContent = '';
-  String dateContent = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildDetailCard(
-              title: 'Package',
-              content: packageContent,
-              context: context,
-              onSave: (newContent) {
-                setState(() {
-                  packageContent = newContent; // Update the content state
-                });
-              },
-            ),
-            const SizedBox(width: 6),
-            buildDetailCard(
-              title: 'Payment',
-              content: paymentContent,
-              context: context,
-              onSave: (newContent) {
-                setState(() {
-                  paymentContent = newContent; // Update the content state
-                });
-              },
-            ),
-            const SizedBox(width: 6),
-            buildDetailCard(
-              title: 'Price',
-              content: priceContent,
-              context: context,
-              onSave: (newContent) {
-                setState(() {
-                  priceContent = newContent; // Update the content state
-                });
-              },
-            ),
-            const SizedBox(width: 6),
-            buildDetailCard(
-              title: 'Date',
-              content: dateContent,
-              context: context,
-              onSave: (newContent) {
-                setState(() {
-                  dateContent = newContent; // Update the content state
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildDetailCard({
-    required String title,
-    required String content,
-    required BuildContext context,
-    required Function(String) onSave, // Callback for saving the new content
-  }) {
-    return Container(
-      width: 160,
-      height: 60,
-      padding: const EdgeInsets.all(4.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          GestureDetector(
-            onTap: () {
-              _showPopup(context, title, content, onSave);
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(2.0),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(6.0),
-                  topRight: Radius.circular(6.0),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                  const Center(
+                    child: Text(
+                      'Customer Details',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.edit, color: Colors.white, size: 10),
+                  const SizedBox(height: 20),
+
+                  // Customer Name Input
+                  CustomInputField(
+                    controller: _custNameController,
+                    hintText: 'Customer Name',
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Enter customer name'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Customer Number Input
+                  CustomInputField(
+                    controller: _custNumberController,
+                    hintText: 'Customer Number',
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter customer number';
+                      } else if (!RegExp(r'^\d+$').hasMatch(value)) {
+                        return 'Only digits allowed';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Package Name Input
+                  CustomInputField(
+                    controller: _packageNameController,
+                    hintText: 'Package Name',
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Enter package name'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Package Price Input
+                  CustomInputField(
+                    controller: _packagePriceController,
+                    hintText: 'Package Price',
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter package price';
+                      } else if (double.tryParse(value) == null) {
+                        return 'Enter a valid number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Save Button
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            custname = _custNameController.text.trim();
+                            custnumber = _custNumberController.text.trim();
+                            packageName = _packageNameController.text.trim();
+                            packagePrice = _packagePriceController.text.trim();
+                            isDetailsSaved = true;
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Details saved')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Colors.blueAccent, // Match your home page
+                        foregroundColor: Colors.white,
+                        elevation: 4,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 28, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.save, size: 20),
+                          SizedBox(width: 8),
+                          Text('Save Details'),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Preview Section
+                  if (isDetailsSaved) ...[
+                    const Center(
+                      child: Text(
+                        'Receipt Preview',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    BigBox(
+                      custname: custname,
+                      custnumber: custnumber,
+                      packageName: packageName,
+                      packagePrice: packagePrice,
+                      bookingDate: DateTime.now(),
+                    ),
+                  ] else ...[
+                    const Center(
+                      child: Text(
+                        'Please save the customer details to preview the receipt.',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            content,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.black54,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
-    );
-  }
-
-  void _showPopup(BuildContext context, String title, String initialContent,
-      Function(String) onSave) {
-    TextEditingController controller =
-        TextEditingController(text: initialContent);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit $title'),
-          content: TextField(
-            controller: controller,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: 'Enter new $title details',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newContent = controller.text;
-                onSave(newContent); // Call onSave to update the content
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
 
-class BigBox extends StatelessWidget {
+class BigBox extends StatefulWidget {
   final String custname;
+  final String custnumber;
+  final String packageName;
+  final String packagePrice;
+  final DateTime bookingDate;
 
-  const BigBox({super.key, required this.custname});
+  const BigBox({
+    super.key,
+    required this.custname,
+    required this.custnumber,
+    required this.packageName,
+    required this.packagePrice,
+    required this.bookingDate,
+  });
+
+  @override
+  State<BigBox> createState() => _BigBoxState();
+}
+
+class _BigBoxState extends State<BigBox> {
+  final keyPrint = GlobalKey();
+  bool printing = false;
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width to apply responsive max width
     double screenWidth = MediaQuery.of(context).size.width;
     double maxWidth = screenWidth > 600 ? 1000 : double.infinity;
 
-    return Center(
-      child: Container(
-        width: maxWidth,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1.0),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Homestay',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'No. 3, Jalan Yoga 13/42,\nSeksyen 13, 40100 Shah Alam,\nSelangor',
-                              style: TextStyle(fontSize: 10),
-                            ),
-                            SizedBox(height: 2),
-                            Text('WhatsApp +60123456789',
-                                style: TextStyle(fontSize: 10)),
-                            SizedBox(height: 2),
-                            Row(
-                              children: [
-                                Text('No: ......................',
-                                    style: TextStyle(fontSize: 10)),
-                                SizedBox(width: 8),
-                                Text('Tarikh: ...............................',
-                                    style: TextStyle(fontSize: 10)),
-                              ],
-                            ),
-                          ],
-                        ),
+    return RepaintBoundary(
+      key: keyPrint,
+      child: Center(
+        child: Container(
+          width: maxWidth,
+          decoration: BoxDecoration(
+            border:
+                Border.all(color: Colors.black.withOpacity(0.5), width: 1.0),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 8)
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section with Homestay and Contact Information
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Homestay',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'No. 3, Jalan Yoga 13/42,\nSeksyen 13, 40100 Shah Alam,\nSelangor',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                          SizedBox(height: 4),
+                          Text('WhatsApp +60123456789',
+                              style: TextStyle(fontSize: 14)),
+                        ],
                       ),
-                      Container(
-                        height: 40,
-                        width: 40,
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.home,
-                          size: 20,
+                    ),
+                    Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.home,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(),
+
+              // Customer Information Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: LowerLabelInputBoxes(
+                  custname: widget.custname,
+                  price: widget.packagePrice,
+                  packageName: widget.packageName,
+                ),
+              ),
+              const Divider(),
+
+              // Receipt Information Section (No and Date)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('No: 123456', style: TextStyle(fontSize: 14)),
+                    Text(
+                        'Tarikh: ${widget.bookingDate.day}/${widget.bookingDate.month}/${widget.bookingDate.year}',
+                        style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Footer Section (Additional Text)
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'Resit ini adalah cetakan komputer',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Only display the Generate Button if not in print mode
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.blueAccent,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Icon(Icons.music_note, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Icon(Icons.facebook, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Icon(Icons.play_circle_filled,
+                          color: Colors.white, size: 20),
+                      SizedBox(width: 12),
+                      Text(
+                        '@ASTANA_RIA_DRAJA',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  LowerLabelInputBoxes(
-                    custname: custname, // Retrieve the value dynamically
-                  ),
-                  const SizedBox(height: 4),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Resit ini adalah cetakan komputer',
-                      style: TextStyle(fontSize: 10, color: Colors.black54),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              color: Colors.blueAccent,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  Icon(Icons.music_note, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  Icon(Icons.facebook, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  Icon(Icons.play_circle_filled, color: Colors.white, size: 20),
-                  SizedBox(width: 12),
-                  Text(
-                    '@ASTANA_RIA_DRAJA',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+              printing
+                  ? const SizedBox.shrink()
+                  : // Can adjust based on your needs
+                  Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: GenerateButton(
+                        onGenerate: () async {
+                          setState(() {
+                            printing = !printing;
+                          });
+
+                          final pdf = pw.Document();
+
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+                          final imageBytes =
+                              await _captureWidgetToImage(keyPrint);
+
+                          pdf.addPage(
+                            pw.Page(
+                              pageFormat: PdfPageFormat.a4,
+                              margin: const pw.EdgeInsets.all(32),
+                              build: (pw.Context context) {
+                                return pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    // Header Section
+                                    pw.Text('ASTANA RIA D\'RAJA HOMESTAY',
+                                        style: pw.TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: pw.FontWeight.bold)),
+                                    pw.SizedBox(height: 4),
+                                    pw.Text(
+                                        'No. 3, Jalan Yoga 13/42, Seksyen 13,\n40100 Shah Alam, Selangor',
+                                        style: pw.TextStyle(fontSize: 12)),
+                                    pw.Text('WhatsApp: +60123456789',
+                                        style: pw.TextStyle(fontSize: 12)),
+                                    pw.Divider(thickness: 1),
+                                    pw.SizedBox(height: 10),
+
+                                    pw.Image(pw.MemoryImage(imageBytes!)),
+
+                                    // Footer
+                                    pw.Text(
+                                        'This is a computer-generated receipt.',
+                                        style: pw.TextStyle(
+                                            fontSize: 10,
+                                            color: PdfColors.grey)),
+                                    pw.SizedBox(height: 12),
+                                    pw.Divider(thickness: 1),
+                                    pw.Align(
+                                      alignment: pw.Alignment.center,
+                                      child: pw.Text(
+                                        '@ASTANA_RIA_DRAJA',
+                                        style: pw.TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: pw.FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+
+                          await Printing.layoutPdf(
+                            onLayout: (PdfPageFormat format) async {
+                              return pdf.save();
+                            },
+                          );
+
+                          setState(() {
+                            printing = !printing;
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<Uint8List?> _captureWidgetToImage(GlobalKey key) async {
+    // Ensure that the key has a valid context
+    if (key.currentContext == null) {
+      return null; // Or handle the error as appropriate
+    }
+
+    // Get the render object of the widget using the key
+    RenderRepaintBoundary boundary =
+        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+    // Capture the image from the RenderRepaintBoundary
+    var image = await boundary.toImage(pixelRatio: 3.0);
+
+    // Convert the captured image to byte data
+    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+
+    // Check if byteData is null and handle accordingly
+    if (byteData == null) {
+      return null; // Or handle the error as appropriate
+    }
+
+    // Return the Uint8List from the byte data
+    return byteData.buffer.asUint8List();
   }
 }
 
 class LowerLabelInputBoxes extends StatefulWidget {
-  final String custname; // Pass customer name from parent widget
-  const LowerLabelInputBoxes({super.key, required this.custname});
+  final String custname;
+  String price;
+  String packageName;
+  LowerLabelInputBoxes(
+      {super.key,
+      required this.custname,
+      required this.price,
+      required this.packageName});
 
   @override
   _LowerLabelInputBoxesState createState() => _LowerLabelInputBoxesState();
 }
 
 class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
-  // Default content for the input boxes
-  String tarikhContent = 'dateContent';
-  String jumlahContent = 'priceContent';
-  String pakejContent = 'packageContent';
-  String bayaranContent = 'paymentContent';
+  String tarikhContent = '2025-05-18';
+  String bayaranContent = 'Paid';
+
+  // Save the details to be used for generating the receipt
+  void _saveDetails() {
+    // For now, we'll just print the details to the console
+    print('Saved Details:');
+    print('Name: ${widget.custname}');
+    print('Date: $tarikhContent');
+    print('Amount: ${widget.price}');
+    print('Package: ${widget.packageName}');
+    print('Payment Status: $bayaranContent');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -496,29 +496,20 @@ class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              LowerLabelInputBox(
-                label: 'Nama',
-                content: widget.custname, // Use custname passed from parent
-              ),
-              const SizedBox(height: 6),
+              LowerLabelInputBox(label: 'Nama', content: widget.custname),
+              const SizedBox(height: 8),
               LowerLabelInputBox(
                 label: 'Tarikh',
                 content: tarikhContent,
-                onSave: (newContent) {
-                  setState(() {
-                    tarikhContent = newContent;
-                  });
-                },
+                onSave: (newContent) =>
+                    setState(() => tarikhContent = newContent),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               LowerLabelInputBox(
                 label: 'Jumlah',
-                content: jumlahContent,
-                onSave: (newContent) {
-                  setState(() {
-                    jumlahContent = newContent;
-                  });
-                },
+                content: widget.price,
+                onSave: (newContent) =>
+                    setState(() => widget.price = newContent),
               ),
             ],
           ),
@@ -530,28 +521,19 @@ class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
             children: [
               LowerLabelInputBox(
                 label: 'Pakej',
-                content: pakejContent,
-                onSave: (newContent) {
-                  setState(() {
-                    pakejContent = newContent;
-                  });
-                },
+                content: widget.packageName,
+                onSave: (newContent) =>
+                    setState(() => widget.packageName = newContent),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               LowerLabelInputBox(
                 label: 'Penginapan',
                 content: bayaranContent,
-                onSave: (newContent) {
-                  setState(() {
-                    bayaranContent = newContent;
-                  });
-                },
+                onSave: (newContent) =>
+                    setState(() => bayaranContent = newContent),
               ),
-              const SizedBox(height: 6),
-              LowerLabelInputBox(
-                label: 'Bayaran',
-                content: 'Paid', // Static content
-              ),
+              const SizedBox(height: 8),
+              LowerLabelInputBox(label: 'Bayaran', content: bayaranContent),
             ],
           ),
         ),
@@ -559,15 +541,9 @@ class _LowerLabelInputBoxesState extends State<LowerLabelInputBoxes> {
     );
   }
 
-  // Method to update the input fields when called from ReceiptDetails
-  void updateFields(
-      String tarikh, String jumlah, String pakej, String bayaran) {
-    setState(() {
-      tarikhContent = tarikh;
-      jumlahContent = jumlah;
-      pakejContent = pakej;
-      bayaranContent = bayaran;
-    });
+  // Method to update fields and save details when user presses the "Save" button
+  void saveDetails() {
+    _saveDetails();
   }
 }
 
@@ -588,14 +564,15 @@ class LowerLabelInputBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(label),
+        Text(label,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         GestureDetector(
           onTap: () {
             if (label == 'Tarikh') {
-              _showDatePicker(context, label, content, onSave); // Open date picker for Tarikh
+              _showDatePicker(context, label, content, onSave);
             } else {
-              _showPopup(context, label, content, onSave); // Other fields open popup
+              _showPopup(context, label, content, onSave);
             }
           },
           child: Container(
@@ -605,7 +582,7 @@ class LowerLabelInputBox extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.blue),
             ),
-            child: Text(content),
+            child: Text(content, style: TextStyle(fontSize: 14)),
           ),
         ),
       ],
@@ -632,16 +609,14 @@ class LowerLabelInputBox extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 String newContent = controller.text;
                 if (onSave != null) {
-                  onSave(newContent); // Call onSave to update the content
+                  onSave(newContent);
                 }
                 Navigator.pop(context);
               },
@@ -653,7 +628,8 @@ class LowerLabelInputBox extends StatelessWidget {
     );
   }
 
-  void _showDatePicker(BuildContext context, String title, String initialContent, Function(String)? onSave) {
+  void _showDatePicker(BuildContext context, String title,
+      String initialContent, Function(String)? onSave) {
     DateTime initialDate = DateTime.now();
     if (initialContent != 'dateContent') {
       initialDate = DateTime.parse(initialContent);
@@ -666,37 +642,89 @@ class LowerLabelInputBox extends StatelessWidget {
       lastDate: DateTime(2101),
     ).then((selectedDate) {
       if (selectedDate != null) {
-        String formattedDate = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+        String formattedDate =
+            "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
         if (onSave != null) {
-          onSave(formattedDate); // Call onSave to update the content
+          onSave(formattedDate);
         }
       }
     });
   }
 }
 
+// Generate button to trigger receipt generation or save functionality
+class GenerateButton extends StatelessWidget {
+  final VoidCallback onGenerate;
+
+  const GenerateButton({super.key, required this.onGenerate});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: onGenerate,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: const Text(
+          'Generate Receipt',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
 class CustomInputField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final bool autofocus;
+  final IconData? icon;
 
   const CustomInputField({
     Key? key,
     this.controller,
     required this.hintText,
+    this.validator,
+    this.keyboardType,
+    this.autofocus = false,
+    this.icon,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      maxLines: null,
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+    return Material(
+      elevation: 2,
+      shadowColor: Colors.black12,
+      borderRadius: BorderRadius.circular(12),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        autofocus: autofocus,
+        decoration: InputDecoration(
+          prefixIcon:
+              icon != null ? Icon(icon, color: Colors.blueAccent) : null,
+          labelText: hintText,
+          labelStyle: const TextStyle(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.blueAccent, width: 1.5),
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       ),
     );
   }
@@ -711,9 +739,7 @@ class ResitRasmiButton extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: FixedSizeButton(
         text: 'RESIT RASMI',
-        onPressed: () {
-        
-        },
+        onPressed: () {},
       ),
     );
   }
@@ -732,8 +758,8 @@ class FixedSizeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 150, 
-      height: 50, 
+      width: 150,
+      height: 50,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -747,7 +773,7 @@ class FixedSizeButton extends StatelessWidget {
           text,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 14, 
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -755,4 +781,3 @@ class FixedSizeButton extends StatelessWidget {
     );
   }
 }
-

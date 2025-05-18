@@ -1,279 +1,257 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class ResponsiveLoginPage extends StatefulWidget {
+  const ResponsiveLoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<ResponsiveLoginPage> createState() => _ResponsiveLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _ResponsiveLoginPageState extends State<ResponsiveLoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
   bool _register = false;
   bool _forgot = false;
   bool _isPasswordVisible = false;
-  // Email validation function using Regex
+  bool _isLoading = false;
+
   String? validateEmail(String? value) {
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    } else if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null; // No error
+    final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
+    if (value == null || value.isEmpty) return 'Sila masukkan emel';
+    if (!emailRegex.hasMatch(value)) return 'Emel tidak sah';
+    return null;
   }
 
-  // Password validation function using Regex
   String? validatePassword(String? value) {
     final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    } else if (!passwordRegex.hasMatch(value)) {
-      return 'Password must be at least 8 characters long with letters and numbers';
+    if (value == null || value.isEmpty) return 'Sila masukkan kata laluan';
+    if (!passwordRegex.hasMatch(value)) {
+      return 'Kata laluan mesti sekurang-kurangnya 8 aksara dan mengandungi nombor';
     }
-    return null; // No error
+    return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    bool isTablet = screenWidth > 600 && screenWidth <= 1024; //for tablet view
-    bool isWeb = screenWidth > 1024; //for web view
+  Future<void> _handleAuthAction() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: isWeb ? screenWidth * 0.1 : 20),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                width: isWeb || isTablet
-                    ? screenWidth * 0.6
-                    : double.infinity, //tab
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: isWeb ? 100 : 70,
-                      backgroundColor: Colors.white,
-                      child: Center(
-                        child: AutoSizeText(
-                          'Logo App',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: isWeb ? 32 : 24, //for web
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.05),
+    setState(() => _isLoading = true);
 
-                    // Email Field
-                    SizedBox(
-                      width: isWeb
-                          ? screenWidth * 0.3
-                          : isTablet
-                              ? screenWidth * 0.7
-                              : double
-                                  .infinity, //for mobile,tablet and web view
-                      child: TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Emel',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        validator:
-                            validateEmail, // Updated with email validation
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
+    try {
+      if (_forgot) {
+        await _auth.sendPasswordResetEmail(email: _emailController.text);
+        _showSnackBar('E-mel tetapan semula telah dihantar!');
+      } else if (_register) {
+        await _auth.createUserWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text);
+        _showSnackBar('Akaun berjaya didaftarkan!');
+      } else {
+        await _auth.signInWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text);
+        _showSnackBar('Log masuk berjaya!');
+      }
+    } catch (e) {
+      _showSnackBar('Ralat: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
-                    // Password Field
-                    if (!_forgot)
-                      SizedBox(
-                        width: isWeb
-                            ? screenWidth * 0.3
-                            : isTablet
-                                ? screenWidth * 0.7
-                                : double.infinity, //added here too
-                        child: TextFormField(
-                          controller: _passwordController,
-                          obscureText: !_isPasswordVisible,
-                          decoration: InputDecoration(
-                            labelText: 'Kata Laluan',
-                            filled: true,
-                            fillColor: Colors.white,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                          validator:
-                              validatePassword, // Updated with password validation
-                        ),
-                      ),
-                    SizedBox(height: screenHeight * 0.05),
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
 
-                    // Login Button
-                    SizedBox(
-                      width: isWeb
-                          ? screenWidth * 0.3
-                          : isTablet
-                              ? screenWidth * 0.6
-                              : double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Validation passed
-                            if (_forgot) {
-                              resetPassword(_emailController.text);
-                            } else {
-                              _register
-                                  ? addUser(
-                                      _emailController.text,
-                                      _passwordController.text,
-                                    )
-                                  : loginUser(
-                                      _emailController.text,
-                                      _passwordController.text,
-                                    );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          backgroundColor: Colors.blue,
-                          minimumSize: Size(screenWidth * 0.2, 50),
-                        ),
-                        child: AutoSizeText(
-                          _forgot
-                              ? 'Tetapkan semula'
-                              : _register
-                                  ? 'Daftar'
-                                  : 'Log Masuk',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: screenHeight * 0.03),
-
-                    // Register & Forgot Password Links
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _register = !_register;
-                          _forgot = false;
-                        });
-                      },
-                      child: Text(
-                        _register ? 'Log masuk' : 'Daftar Akaun Baru',
-                        style: TextStyle(color: Colors.blue, fontSize: 16),
-                      ),
-                    ),
-                    if (!_forgot)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _forgot = true;
-                          });
-                        },
-                        child: Text(
-                          'Terlupa Kata Laluan?',
-                          style: TextStyle(color: Colors.blue, fontSize: 16),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+  Widget _buildTextField({
+    required String label,
+    required IconData icon,
+    required TextEditingController controller,
+    required String? Function(String?) validator,
+    bool obscure = false,
+    Widget? suffixIcon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );
   }
 
-  Future<void> loginUser(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login Successful!')),
-      );
-      // Navigate to home page or another screen
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Failed: ${e.toString()}')),
-      );
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double screenWidth = constraints.maxWidth;
 
-  Future<void> resetPassword(String email) async {
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email')),
-      );
-    } else {
-      try {
-        await _auth.sendPasswordResetEmail(email: email);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reset password send to email!')),
-        );
-      } on FirebaseAuthException catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(err.message.toString())),
-        );
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(err.toString())),
-        );
-      }
-    }
-  }
+        bool isMobile = screenWidth < 600;
+        bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+        bool isWeb = screenWidth >= 1024;
 
-  Future<void> addUser(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User Added Successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error Adding User: ${e.toString()}')),
-      );
-    }
+        double formWidth = isMobile
+            ? double.infinity
+            : isTablet
+                ? screenWidth * 0.8
+                : 500;
+
+        return Scaffold(
+          backgroundColor: Colors.lightBlue[50],
+          body: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 16 : 32,
+                vertical: 32,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: formWidth),
+                child: Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.blue.shade100,
+                            child: Icon(Icons.person,
+                                size: 50, color: Colors.blue),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Email Field
+                          _buildTextField(
+                            label: 'Emel',
+                            icon: Icons.email_outlined,
+                            controller: _emailController,
+                            validator: validateEmail,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Password Field
+                          if (!_forgot)
+                            _buildTextField(
+                              label: 'Kata Laluan',
+                              icon: Icons.lock_outline,
+                              controller: _passwordController,
+                              validator: validatePassword,
+                              obscure: !_isPasswordVisible,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isPasswordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () => setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                }),
+                              ),
+                            ),
+
+                          const SizedBox(height: 24),
+
+                          // Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _isLoading ? null : _handleAuthAction,
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor: Colors.blue,
+                              ),
+                              icon: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : Icon(_forgot
+                                      ? Icons.refresh
+                                      : _register
+                                          ? Icons.person_add
+                                          : Icons.login),
+                              label: Text(
+                                _forgot
+                                    ? 'Tetapkan Semula'
+                                    : _register
+                                        ? 'Daftar'
+                                        : 'Log Masuk',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Toggle Options
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(_register
+                                  ? 'Sudah ada akaun? '
+                                  : 'Belum ada akaun? '),
+                              GestureDetector(
+                                onTap: () => setState(() {
+                                  _register = !_register;
+                                  _forgot = false;
+                                }),
+                                child: Text(
+                                  _register ? 'Log Masuk' : 'Daftar',
+                                  style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          if (!_forgot)
+                            TextButton(
+                              onPressed: () => setState(() {
+                                _forgot = true;
+                                _register = false;
+                              }),
+                              child: const Text(
+                                'Terlupa Kata Laluan?',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

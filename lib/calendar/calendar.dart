@@ -79,94 +79,101 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
   }
 
   Column buildCalendar(int daysInMonth, int firstDayIndex) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          '${monthNames[month - 1]} $year',
-          style: TextStyle(
-            fontSize: 24,
-            color: Colors.purple[900],
-            fontWeight: FontWeight.bold,
-          ),
+        /// Month + Year Title
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              onPressed: decrementMonth,
+            ),
+            Text(
+              '${monthNames[month - 1]} $year',
+              style: TextStyle(
+                fontSize: screenWidth < 600 ? 20 : 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward_ios),
+              onPressed: incrementMonth,
+            ),
+          ],
         ),
+
         const SizedBox(height: 8),
+
+        /// Weekdays Header
         Container(
-          color: Colors.purple,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                  child: Center(
-                      child: Text('SUN',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('MON',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('TUE',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('WED',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('THU',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('FRI',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-              Expanded(
-                  child: Center(
-                      child: Text('SAT',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)))),
-            ],
+          decoration: BoxDecoration(
+            color: Colors.deepPurple,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+                .map((d) => Expanded(
+                      child: Center(
+                        child: Text(
+                          d,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 10),
+
+        /// Day Grid
         Expanded(
           child: GridView.builder(
-            shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
             itemCount: daysInMonth + firstDayIndex,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              childAspectRatio: 1.3,
+              childAspectRatio: 1.1,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
             ),
             itemBuilder: (context, index) {
               final day =
                   (index >= firstDayIndex) ? index - firstDayIndex + 1 : null;
-
               final dateKey = day != null
                   ? "$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}"
                   : null;
 
-              final isHoliday = dateKey != null && holidayDates.any((holiday) => holiday.dateIso == dateKey);
+              final isHoliday = dateKey != null &&
+                  holidayDates.any((h) => h.dateIso == dateKey);
+
+              final isToday = day == DateTime.now().day &&
+                  month == DateTime.now().month &&
+                  year == DateTime.now().year;
+
+              final isSelected = day == selectedDay;
+
+              final hasBooking = bookings.containsKey(dateKey);
+
+              Color bgColor = Colors.white;
+              if (isSelected) {
+                bgColor = Colors.green[200]!;
+              } else if (isToday) {
+                bgColor = Colors.blue[100]!;
+              } else if (isHoliday) {
+                bgColor = Colors.red[100]!;
+              } else if (hasBooking) {
+                bgColor = Colors.orange[100]!;
+              }
 
               return GestureDetector(
                 onTap: day != null
@@ -177,97 +184,75 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
                         showBookings(context, day);
                       }
                     : null,
-                child: Container(
-                  margin: const EdgeInsets.all(4),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
                   decoration: BoxDecoration(
-                    color: day == selectedDay
-                          ? Colors.green[100]
-                          : isHoliday
-                              ? Colors.red[100]
-                              : day == DateTime.now().day &&
-                                      month == DateTime.now().month &&
-                                      year == DateTime.now().year
-                                ? Colors.grey
-                                : holidayDates.any(
-                                        (e) => e.dateIso == "$day-$month-$year")
-                                    ? Colors.pink
-                                    : Colors.white,
-                    border: Border.all(color: Colors.grey),
+                    color: bgColor,
+                    border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
-                    child: day != null
-                        ? Text(
-                            '$day',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                    child: Text(
+                      day != null ? '$day' : '',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               );
             },
           ),
         ),
-        const SizedBox(height: 8),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                Text('BOOKED', style: TextStyle(fontSize: 14)),
-                Text('8 DAYS',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            Column(
-              children: [
-                Text('AVAILABLE', style: TextStyle(fontSize: 14)),
-                Text('23 DAYS',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ],
+
+        const SizedBox(height: 10),
+
+        /// Booking Summary
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _legendBox('Booked', Colors.orange[200]!),
+              _legendBox('Holiday', Colors.red[200]!),
+              _legendBox('Today', Colors.blue[100]!),
+              _legendBox('Selected', Colors.green[200]!),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 10),
+
+        /// Search Button
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              onPressed: decrementMonth,
-            ),
-            ElevatedButton(
+            ElevatedButton.icon(
+              onPressed: _showDateSearchDialog,
+              icon: const Icon(Icons.calendar_month_outlined,
+                  color: Colors.white),
+              label: const Text(
+                'Carian Tarikh',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                elevation: 4,
+                shadowColor: Colors.deepPurpleAccent,
               ),
-              onPressed: () {},
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.search, size: 18),
-                    SizedBox(width: 8),
-                    Text('CARIAN', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: incrementMonth,
             ),
           ],
         ),
-        // Your holidays table
       ],
     );
   }
@@ -279,20 +264,80 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Bookings for $dateKey'),
-        content: dayBookings.isNotEmpty
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: dayBookings.map((booking) => Text(booking)).toList(),
-              )
-            : const Text('No bookings for this day.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 12,
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 300, maxWidth: 400),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Tempahan: $dateKey',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (dayBookings.isNotEmpty)
+                  ...dayBookings
+                      .map(
+                        (booking) => Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple[50],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.schedule,
+                                  color: Colors.deepPurple),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  booking,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList()
+                else
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Tiada tempahan pada hari ini.',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    label: const Text('Tutup'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.deepPurple,
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -325,28 +370,155 @@ class _BookingCalendarPageState extends State<BookingCalendarPage> {
     holidayDates = holidays;
     setState(() {});
   }
+
+  Widget _legendBox(String label, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+
+  void _showDateSearchDialog() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(year, month),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      helpText: 'Pilih Tarikh',
+      cancelText: 'Batal',
+      confirmText: 'Pilih',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.deepPurple,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.deepPurple,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        year = picked.year;
+        month = picked.month;
+        selectedDay = picked.day;
+      });
+
+      fetchHoliday(year, month);
+      showBookings(context, picked.day);
+    }
+  }
 }
 
 class HolidaysTable extends StatelessWidget {
   final List<CalendarificHoliday> holidayDates;
   final int selectedMonth;
 
-  const HolidaysTable(
-      {super.key, required this.holidayDates, required this.selectedMonth});
+  const HolidaysTable({
+    super.key,
+    required this.holidayDates,
+    required this.selectedMonth,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: holidayDates.length,
-      itemBuilder: (context, index) {
-        final holidayDate = holidayDates[index];
-        final month = holidayDate.dateIso.split('-')[1];
-        return ListTile(
-          title: Text(holidayDate.name),
-          subtitle: Text("${holidayDate.dateIso}"),
-          trailing: const Icon(Icons.calendar_today),
-        );
-      },
+    if (holidayDates.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Tiada cuti untuk bulan ini.',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Card(
+        margin: const EdgeInsets.all(12),
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Senarai Cuti Bulan Ini',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: holidayDates.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final holiday = holidayDates[index];
+                  final name = holiday.name;
+                  final date = holiday.dateIso;
+
+                  return ListTile(
+                    leading: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(Icons.flag, color: Colors.redAccent),
+                    ),
+                    title: Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Text(
+                      date,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                    trailing: const Icon(Icons.calendar_today_outlined,
+                        color: Colors.deepPurple),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
