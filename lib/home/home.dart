@@ -51,15 +51,32 @@ class HomePageState extends State<HomePage> {
     bool isWebLayout = MediaQuery.of(context).size.aspectRatio > 1;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F9FC), // Soft light grey-blue
       appBar: AppBar(
-        title: Text(_tabTitles[_selectedIndex]),
-        backgroundColor: Colors.blue,
+        elevation: 2,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: CircleAvatar(
+            backgroundColor: Colors.blue.shade100,
+            child: const Icon(Icons.home, color: Colors.blue),
+          ),
+        ),
+        title: Text(
+          _tabTitles[_selectedIndex],
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+            fontSize: 18,
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: () {
-              _logout(context); //context passed here
-            },
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'Log Keluar',
+            onPressed: () => _logout(context),
           ),
         ],
       ),
@@ -70,33 +87,53 @@ class HomePageState extends State<HomePage> {
           child: _widgetOptions[_selectedIndex],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Booking Calendar',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Receipt Generator',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Senarai Pelanggan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Senarai Resit',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Homestay Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month),
+              label: 'Kalender',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long),
+              label: 'Resit',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'Pelanggan',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Senarai Resit',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_work),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.blueAccent,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
